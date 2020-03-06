@@ -1,16 +1,21 @@
 #![allow(dead_code)]
 use itertools::Itertools;
-use std::{ops::Index, fmt::{self, Debug}};
+use std::{
+    fmt::{self, Debug},
+    ops::Index,
+};
 
 /// CSR (compressed sparse row)
+/// ```md
 /// [2, 5, 6, 1, 3, 5, 6, 10] |neighbourhoods| = n_links
 ///  ^        ^  ^         ^
 /// [0,       3, 4,        7] |neighbourood_boundaries| = n_vertices + 1
 ///
-/// :add_link(1, 50)
+/// add_link(1, 50)
 /// [2, 5, 6, 50, 1, 3, 5, 6, 10]
 ///  ^        ^      ^         ^
 /// [0,       3,     5,        8]
+/// ```
 ///
 /// Changing is hard
 ///
@@ -33,17 +38,17 @@ impl GraphCSR {
 
     /// Add a link to the GraphCSR
     ///
+    /// # Panics
+    /// If a link is added beyond the value passed to the constructor
+    ///
     /// # Example
     /// ```
     /// use aava::graph::GraphCSR;
     ///
     /// let mut g = GraphCSR::new(2, 1);
     /// g.add_link(0, 1);
-    /// assert_eq!(g[0], &[1]);
+    /// assert_eq!(&g[0], &[1]);
     /// ```
-    ///
-    /// # Panics
-    /// If a link is added beyond the value passed to the constructor
     pub fn add_link(&mut self, from: usize, to: usize) {
         let start_of_neighbours = self.row_indexes[from];
         self.links.insert_checked(start_of_neighbours, to as isize);
@@ -60,7 +65,10 @@ impl GraphCSR {
     ///
     /// let mut g = GraphCSR::new(2, 1);
     /// g.add_link(0, 1);
-    /// assert_eq!(g.neighbourhoods(), &[[1]]);
+    /// assert_eq!(
+    ///     g.neighbourhoods().collect::<Vec<_>>(),
+    ///     [&[1], &[] as &[isize]]
+    /// );
     /// ```
     pub fn neighbourhoods(&self) -> impl Iterator<Item = &[isize]> {
         self.row_indexes
@@ -82,9 +90,9 @@ impl GraphCSR {
         }
         unimplemented!()
     }
-
 }
 
+/// Indexing
 impl Index<usize> for GraphCSR {
     type Output = [isize];
     fn index(&self, i: usize) -> &Self::Output {
