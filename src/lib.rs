@@ -1,5 +1,5 @@
 pub mod graph;
-use graph::{csr::GraphCSR, StaticGraph};
+use graph::{csr::GraphCSR, Graph};
 
 pub fn main() {
     let g = GraphCSR::new(

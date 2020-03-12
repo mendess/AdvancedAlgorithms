@@ -1,7 +1,8 @@
 // use static_assertions::{assert_not_impl_any, const_assert};
-use super::{Graph, StaticGraph};
+use super::{Edge, Graph};
 use itertools::Itertools;
-use static_assertions::{const_assert};
+use rand::Rng;
+use static_assertions::const_assert;
 use std::{
     convert::TryFrom,
     fmt::{self, Debug},
@@ -33,9 +34,6 @@ pub struct GraphCSR {
 
 impl Graph for GraphCSR {
     type NodeName = usize;
-}
-
-impl StaticGraph for GraphCSR {
     /// Create a new GraphCSR
     fn new<I>(n_vertices: usize, n_links: usize, i: I) -> Self
     where
@@ -50,6 +48,28 @@ impl StaticGraph for GraphCSR {
         });
         s
     }
+
+    fn vertices(&self) -> usize {
+        self.row_indexes.len() - 1
+    }
+
+    fn edges(&self) -> usize {
+        self.links.len()
+    }
+
+    fn random_edge<R: Rng>(&self, mut rng: R) -> Edge<Self> {
+        let neighbour_idx = rng.gen_range(0, self.edges());
+        let from = match self.row_indexes.binary_search(&neighbour_idx) {
+            Ok(mut idx) => {
+                while self.row_indexes[idx] == neighbour_idx {
+                    idx += 1
+                }
+                idx - 1
+            }
+            Err(idx) => idx - 1,
+        };
+        (from, self.links[neighbour_idx])
+    }
 }
 
 impl GraphCSR {
@@ -57,15 +77,6 @@ impl GraphCSR {
     ///
     /// # Panics
     /// If a link is added beyond the value passed to the constructor
-    ///
-    /// # Example
-    /// ```
-    /// use aava::graph::{Graph, csr::GraphCSR};
-    ///
-    /// let mut g = GraphCSR::new(2, 1);
-    /// g.add_link(0, 1);
-    /// assert_eq!(&g[0], &[1]);
-    /// ```
     fn add_link(&mut self, from: usize, to: usize) -> bool {
         if from > self.row_indexes.len() {
             return false;
@@ -80,15 +91,6 @@ impl GraphCSR {
         true
     }
     /// Iterate over the neighbours of each edge.
-    ///
-    /// # Example
-    /// ```
-    /// use aava::graph::{Graph, csr::GraphCSR};
-    ///
-    /// let mut g = GraphCSR::new(2, 1);
-    /// g.add_link(0, 1);
-    /// assert!(g.neighbourhoods().eq([&[1], &[] as &[usize]].iter().copied()));
-    /// ```
     pub fn neighbourhoods(&self) -> impl Iterator<Item = &[usize]> {
         self.row_indexes
             .iter()
@@ -155,7 +157,7 @@ impl Debug for GraphCSR {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         self.neighbourhoods()
             .enumerate()
-            .try_for_each(|(i, s)| write!(f, "{}: {}\n", i, s.iter().format(" -> ")))
+            .try_for_each(|(i, s)| writeln!(f, "{}: {}", i, s.iter().format(" -> ")))
     }
 }
 
@@ -182,10 +184,6 @@ impl<T> StaticVec<T> for Vec<T> {
 pub struct GraphR {
     links: Box<[isize]>,
     row_indexes: Box<[usize]>,
-}
-
-impl Graph for GraphR {
-    type NodeName = isize;
 }
 
 #[allow(unused_variables)]
