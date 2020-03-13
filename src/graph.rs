@@ -4,7 +4,7 @@ pub mod matrix;
 use std::ops::Index;
 use rand::Rng;
 
-type Edge<G> = (<G as Graph>::NodeName, <G as Graph>::NodeName);
+pub type Edge<G> = (<G as Graph>::NodeName, <G as Graph>::NodeName);
 
 pub trait Graph
 where

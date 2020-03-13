@@ -1,4 +1,5 @@
 pub mod graph;
+pub mod algorithms;
 use graph::{csr::GraphCSR, Graph};
 
 pub fn main() {
