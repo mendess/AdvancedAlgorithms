@@ -1,12 +1,28 @@
-pub mod graph;
 pub mod algorithms;
-use graph::{csr::GraphCSR, Graph};
+pub mod graphs;
+use graphs::{csr::GraphCSR, Graph, ToExactSizeIter};
 
 pub fn main() {
     let g = GraphCSR::new(
         5,
-        25,
-        (0..5).flat_map(|from| (0..5).into_iter().map(move |to| (from, to))),
+        (0..5)
+            .flat_map(|from| (0..5).into_iter().map(move |to| (from, to)))
+            .to_exact_size_iter(25),
     );
     println!("{:?}", g);
+}
+
+#[cfg(test)]
+mod test {
+    use crate::graphs::{matrix::Adjacency, Graph};
+    use crate::graph;
+    #[test]
+    fn test_macro1() {
+        let graph = graph![Adjacency = (3) {
+            0 => 1;
+            0 => 2;
+            1 => 0;
+        }];
+        assert_eq!(graph.edges(), 3);
+    }
 }

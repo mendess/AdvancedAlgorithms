@@ -4,6 +4,7 @@ use itertools::Itertools;
 use rand::Rng;
 use static_assertions::const_assert;
 use std::{
+    borrow::Cow,
     convert::TryFrom,
     fmt::{self, Debug},
     mem,
@@ -35,15 +36,15 @@ pub struct GraphCSR {
 impl Graph for GraphCSR {
     type NodeName = usize;
     /// Create a new GraphCSR
-    fn new<I>(n_vertices: usize, n_links: usize, i: I) -> Self
+    fn new<I>(n_vertices: usize, edges: I) -> Self
     where
-        I: IntoIterator<Item = (Self::NodeName, Self::NodeName)>,
+        I: ExactSizeIterator<Item = Edge<Self>>,
     {
         let mut s = Self {
-            links: Vec::with_capacity(n_links),
+            links: Vec::with_capacity(edges.len()),
             row_indexes: vec![0; n_vertices + 1].into_boxed_slice(),
         };
-        i.into_iter().for_each(|(from, to)| {
+        edges.for_each(|(from, to)| {
             s.add_link(from, to);
         });
         s
@@ -70,6 +71,12 @@ impl Graph for GraphCSR {
         };
         (from, self.links[neighbour_idx])
     }
+
+    fn neighbours(&self, i: usize) -> Cow<'_, [Self::NodeName]> {
+        let from = self.row_indexes[i];
+        let to = self.row_indexes[i + 1];
+        self.links[from..to].into()
+    }
 }
 
 impl GraphCSR {
@@ -89,13 +96,6 @@ impl GraphCSR {
             .iter_mut()
             .for_each(|i| *i += 1);
         true
-    }
-    /// Iterate over the neighbours of each edge.
-    pub fn neighbourhoods(&self) -> impl Iterator<Item = &[usize]> {
-        self.row_indexes
-            .iter()
-            .tuple_windows()
-            .map(move |(&s, &e)| &self.links[s..e])
     }
 
     pub fn convert_to_r(self) -> GraphR {
@@ -140,6 +140,14 @@ impl GraphCSR {
         final_links.truncate(writer);
         final_links.shrink_to_fit();
         unimplemented!()
+    }
+
+    /// Iterate over the neighbours of each edge.
+    fn neighbourhoods(&self) -> impl Iterator<Item = &[<Self as Graph>::NodeName]> {
+        self.row_indexes
+            .iter()
+            .tuple_windows()
+            .map(move |(&s, &e)| &self.links[s..e])
     }
 }
 
