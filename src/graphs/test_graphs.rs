@@ -1,4 +1,4 @@
-use super::{Graph, Vertex};
+use super::{Graph, ToExactSizeIter, Vertex};
 use crate::graph;
 use itertools::Itertools;
 use rand::{
@@ -69,20 +69,21 @@ where
     R: Rng,
 {
     let mut set = HashSet::new();
-    let edges = Uniform::from(N::from(0)..n)
-        .sample_iter(rng)
-        .chunks(2)
-        .into_iter()
-        .map(|mut a| {
-            let a0 = a.next().unwrap();
-            let a1 = a.next().unwrap();
-            (a0, a1)
-        })
-        .filter(|a| set.insert(*a))
-        .take(m)
-        .collect::<Vec<_>>();
-
-    G::new(n.into(), edges.into_iter())
+    G::new(
+        n.into(),
+        Uniform::from(N::from(0)..n)
+            .sample_iter(rng)
+            .chunks(2)
+            .into_iter()
+            .map(|mut a| {
+                let a0 = a.next().unwrap();
+                let a1 = a.next().unwrap();
+                (a0, a1)
+            })
+            .filter(|a| set.insert(*a))
+            .take(m)
+            .to_exact_size(m),
+    )
 }
 
 pub fn random_graph_concrete<G, R>(n: usize, m: usize, rng: R) -> G
@@ -91,20 +92,21 @@ where
     R: Rng,
 {
     let mut set = HashSet::new();
-    let edges = Uniform::from(0..n)
-        .sample_iter(rng)
-        .chunks(2)
-        .into_iter()
-        .map(|mut a| {
-            let a0 = a.next().unwrap();
-            let a1 = a.next().unwrap();
-            (a0, a1)
-        })
-        .filter(|a| set.insert(*a))
-        .take(m)
-        .collect::<Vec<_>>();
-
-    G::new(n.into(), edges.into_iter())
+    G::new(
+        n.into(),
+        Uniform::from(0..n)
+            .sample_iter(rng)
+            .chunks(2)
+            .into_iter()
+            .map(|mut a| {
+                let a0 = a.next().unwrap();
+                let a1 = a.next().unwrap();
+                (a0, a1)
+            })
+            .filter(|a| set.insert(*a))
+            .take(m)
+            .to_exact_size(m),
+    )
 }
 
 /// Generates a graph using the Evdos Ronmi method.
