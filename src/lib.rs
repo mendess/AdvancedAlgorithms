@@ -1,5 +1,6 @@
 pub mod algorithms;
 pub mod graphs;
+pub mod util;
 use graphs::{csr::GraphCSR, Graph, ToExactSizeIter};
 
 pub fn main() {
@@ -7,7 +8,7 @@ pub fn main() {
         5,
         (0..5)
             .flat_map(|from| (0..5).into_iter().map(move |to| (from, to)))
-            .to_exact_size_iter(25),
+            .to_exact_size(25),
     );
     println!("{:?}", g);
 }

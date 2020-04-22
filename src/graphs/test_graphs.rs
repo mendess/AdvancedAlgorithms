@@ -1,12 +1,8 @@
 use super::Graph;
 use crate::graph;
+// use rand_distr::Binomial;
 
-pub fn graph_one<G: Graph<NodeName = usize>>() -> G
-where
-    G: std::ops::Index<usize>,
-    for<'a> &'a <G as std::ops::Index<<G as Graph>::NodeName>>::Output:
-        IntoIterator<Item = &'a <G as Graph>::NodeName>,
-{
+pub fn graph_one<G: Graph<NodeId = usize>>() -> G {
     graph!(G = (10) {
         0 => 1;
         0 => 2;
@@ -55,3 +51,17 @@ where
         3 => 7;
     })
 }
+
+///// G(N,P) - Evdos Ronmi
+/////
+/////        (N)(N - 1)
+///// E[N] = ---------- P
+/////            2
+/////
+///// G(N,M) <=> G(N,P)
+/////
+/////
+//fn random_graph<G: Graph<NodeId=usize>>(n: usize) -> G {
+//    let dist = Binomial::new(n, (n * (n - 1)) / 2);
+
+//}

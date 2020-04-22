@@ -1,15 +1,17 @@
 // use static_assertions::{assert_not_impl_any, const_assert};
-use super::{Edge, Graph};
+use super::Graph;
 use itertools::Itertools;
 use rand::Rng;
 use static_assertions::const_assert;
 use std::{
-    borrow::Cow,
     convert::TryFrom,
     fmt::{self, Debug},
     mem,
     ops::Index,
 };
+
+type NodeId = <GraphCSR as Graph>::NodeId;
+type Edge = super::Edge<NodeId>;
 
 /// CSR (compressed sparse row)
 /// ```md
@@ -34,11 +36,11 @@ pub struct GraphCSR {
 }
 
 impl Graph for GraphCSR {
-    type NodeName = usize;
+    type NodeId = usize;
     /// Create a new GraphCSR
     fn new<I>(n_vertices: usize, edges: I) -> Self
     where
-        I: ExactSizeIterator<Item = Edge<Self>>,
+        I: ExactSizeIterator<Item = Edge>,
     {
         let mut s = Self {
             links: Vec::with_capacity(edges.len()),
@@ -58,7 +60,7 @@ impl Graph for GraphCSR {
         self.links.len()
     }
 
-    fn random_edge<R: Rng>(&self, mut rng: R) -> Edge<Self> {
+    fn random_edge<R: Rng>(&self, mut rng: R) -> Edge {
         let neighbour_idx = rng.gen_range(0, self.edges());
         let from = match self.row_indexes.binary_search(&neighbour_idx) {
             Ok(mut idx) => {
@@ -71,15 +73,15 @@ impl Graph for GraphCSR {
         };
         (from, self.links[neighbour_idx])
     }
-
-    fn neighbours(&self, i: usize) -> Cow<'_, [Self::NodeName]> {
-        let from = self.row_indexes[i];
-        let to = self.row_indexes[i + 1];
-        self.links[from..to].into()
-    }
 }
 
 impl GraphCSR {
+    pub fn neighbours(&self, i: usize) -> impl Iterator<Item = &<Self as Graph>::NodeId> {
+        let from = self.row_indexes[i];
+        let to = self.row_indexes[i + 1];
+        self.links[from..to].iter()
+    }
+
     /// Add a link to the GraphCSR
     ///
     /// # Panics
@@ -143,7 +145,7 @@ impl GraphCSR {
     }
 
     /// Iterate over the neighbours of each edge.
-    fn neighbourhoods(&self) -> impl Iterator<Item = &[<Self as Graph>::NodeName]> {
+    fn neighbourhoods(&self) -> impl Iterator<Item = &[<Self as Graph>::NodeId]> {
         self.row_indexes
             .iter()
             .tuple_windows()

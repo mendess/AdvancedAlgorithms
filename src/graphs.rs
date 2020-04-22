@@ -1,29 +1,34 @@
 pub mod csr;
+pub mod edge_list;
 pub mod matrix;
 pub mod test_graphs;
 
 use rand::Rng;
-use std::borrow::Cow;
 
-pub type Edge<G> = (<G as Graph>::NodeName, <G as Graph>::NodeName);
+pub type Edge<N> = (N, N);
 
 pub trait Graph {
-    type NodeName: Clone;
+    type NodeId: Clone;
 
     fn new<I>(n_vertices: usize, edges: I) -> Self
     where
-        I: ExactSizeIterator<Item = Edge<Self>>;
+        I: ExactSizeIterator<Item = Edge<Self::NodeId>>;
 
     fn vertices(&self) -> usize;
     fn edges(&self) -> usize;
-    fn random_edge<R: Rng>(&self, rng: R) -> Edge<Self>;
-    fn neighbours(&self, node: Self::NodeName) -> Cow<'_, [Self::NodeName]>;
+    fn random_edge<R: Rng>(&self, rng: R) -> Edge<Self::NodeId>;
+}
+
+pub trait EdgeListGraph: Graph {
+    fn as_edges(&self) -> &[Edge<Self::NodeId>];
+    fn as_edges_mut(&mut self) -> &mut [Edge<Self::NodeId>];
+    fn into_edges(self) -> Vec<Edge<Self::NodeId>>;
 }
 
 pub trait MutableGraph: Graph {
     fn parcial<I>(n_vertices: usize, n_links: usize, edges: I) -> Self
     where
-        I: IntoIterator<Item = Edge<Self>>;
+        I: IntoIterator<Item = Edge<Self::NodeId>>;
 
     fn empty(n_vertices: usize, n_links: usize) -> Self
     where
@@ -32,14 +37,16 @@ pub trait MutableGraph: Graph {
         MutableGraph::parcial(n_vertices, n_links, std::iter::empty())
     }
 
-    fn add_link(&mut self, from: usize, to: usize) -> bool;
+    fn add_link(&mut self, from: Self::NodeId, to: Self::NodeId) -> bool;
+}
 
-    fn contract(&mut self, edge: Edge<Self>);
+pub trait ContractableGraph: MutableGraph {
+    fn contract(&mut self, edge: Edge<Self::NodeId>);
 }
 
 pub struct ExactSizeIter<I> {
-    iter: I,
-    size: usize,
+    pub iter: I,
+    pub size: usize,
 }
 
 impl<I: Iterator> Iterator for ExactSizeIter<I> {
@@ -66,7 +73,7 @@ impl<I: Iterator> ExactSizeIterator for ExactSizeIter<I> {
 
 pub trait ToExactSizeIter: Iterator + Sized {
     #[inline]
-    fn to_exact_size_iter(self, size: usize) -> ExactSizeIter<Self> {
+    fn to_exact_size(self, size: usize) -> ExactSizeIter<Self> {
         ExactSizeIter { iter: self, size }
     }
 }

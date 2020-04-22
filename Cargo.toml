@@ -9,4 +9,5 @@ edition = "2018"
 [dependencies]
 itertools = "0.8.x"
 rand = "0.7.x"
+rand_distr = "0.2.x"
 static_assertions = "1.1.x"
