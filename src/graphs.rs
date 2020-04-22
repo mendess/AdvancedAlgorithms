@@ -7,8 +7,16 @@ use rand::Rng;
 
 pub type Edge<N> = (N, N);
 
+pub trait Vertex
+where
+    Self: Copy + std::hash::Hash + Eq + From<u8> + Into<usize> + PartialOrd,
+{
+}
+
+impl<T> Vertex for T where T: Copy + std::hash::Hash + Eq + From<u8> + Into<usize> + PartialOrd {}
+
 pub trait Graph {
-    type NodeId: Clone;
+    type NodeId: Vertex;
 
     fn new<I>(n_vertices: usize, edges: I) -> Self
     where

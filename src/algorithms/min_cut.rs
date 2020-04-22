@@ -138,6 +138,7 @@ pub mod karger_stein {
 #[cfg(test)]
 mod test {
     use crate::graphs::{edge_list::EdgeList, test_graphs};
+    use rand::thread_rng;
     #[test]
     fn karger_stein() {
         assert_eq!(
@@ -152,5 +153,13 @@ mod test {
             super::karger_stein::karger(test_graphs::graph_one::<EdgeList>(), 10),
             3
         )
+    }
+
+    #[test]
+    fn karget_stein_random() {
+        super::karger_stein::karger_stein(
+            test_graphs::random_graph_er::<EdgeList, usize, _>(10, 0.2, thread_rng()),
+            10,
+        );
     }
 }

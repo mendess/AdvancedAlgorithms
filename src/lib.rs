@@ -15,8 +15,8 @@ pub fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::graphs::{matrix::Adjacency, Graph};
     use crate::graph;
+    use crate::graphs::{matrix::Adjacency, Graph};
     #[test]
     fn test_macro1() {
         let graph = graph![Adjacency = (3) {
