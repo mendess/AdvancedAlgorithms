@@ -8,12 +8,13 @@ edition = "2018"
 
 [dependencies]
 itertools = "0.8.x"
-rand = { version = "0.7.x", features = ["small_rng"] }
+rand = "0.7.x"
 rand_distr = "0.2.x"
 static_assertions = "1.1.x"
 
 [dev-dependencies]
 criterion = "0.3"
+rand = { version = "0.7.x", features = ["small_rng"] }
 
 [[bench]]
 name = "random_graphs"
