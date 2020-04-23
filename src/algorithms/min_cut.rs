@@ -76,12 +76,12 @@ pub mod karger_stein {
         }
     }
 
-    pub fn karger<G>(edges: G, n_nodes: usize) -> usize
+    pub fn karger<G>(edges: &mut G, n_nodes: usize) -> usize
     where
         G: EdgeListGraph,
         G::NodeId: Into<usize> + Copy,
     {
-        let mut edges = edges.into_edges();
+        let mut edges = edges.as_edges_mut();
         let log = (!n_nodes).trailing_zeros();
         let runs = log * log + 2;
         (0..runs)
@@ -120,12 +120,12 @@ pub mod karger_stein {
         }
     }
 
-    pub fn karger_stein<G>(edges: G, n_nodes: usize) -> usize
+    pub fn karger_stein<G>(edges: &mut G, n_nodes: usize) -> usize
     where
         G: EdgeListGraph,
         G::NodeId: Into<usize> + Copy,
     {
-        let mut edges = edges.into_edges();
+        let mut edges = edges.as_edges_mut();
         let log = (!n_nodes).trailing_zeros();
         let runs = log * log + 2;
         (0..runs)
@@ -142,7 +142,7 @@ mod test {
     #[test]
     fn karger_stein() {
         assert_eq!(
-            super::karger_stein::karger_stein(test_graphs::graph_one::<EdgeList>(), 10),
+            super::karger_stein::karger_stein(&mut test_graphs::graph_one::<EdgeList>(), 10),
             3
         )
     }
@@ -150,7 +150,7 @@ mod test {
     #[test]
     fn karger() {
         assert_eq!(
-            super::karger_stein::karger(test_graphs::graph_one::<EdgeList>(), 10),
+            super::karger_stein::karger(&mut test_graphs::graph_one::<EdgeList>(), 10),
             3
         )
     }
@@ -158,7 +158,7 @@ mod test {
     #[test]
     fn karget_stein_random() {
         super::karger_stein::karger_stein(
-            test_graphs::random_graph_er::<EdgeList, usize, _>(10, 0.2, thread_rng()),
+            &mut test_graphs::random_graph_er::<EdgeList, usize, _>(10, 0.2, thread_rng()),
             10,
         );
     }

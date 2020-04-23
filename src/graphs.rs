@@ -28,9 +28,11 @@ pub trait Graph {
 }
 
 pub trait EdgeListGraph: Graph {
+    type Edges: IntoIterator<Item = Edge<Self::NodeId>>;
+
     fn as_edges(&self) -> &[Edge<Self::NodeId>];
     fn as_edges_mut(&mut self) -> &mut [Edge<Self::NodeId>];
-    fn into_edges(self) -> Vec<Edge<Self::NodeId>>;
+    fn into_edges(self) -> Self::Edges;
 }
 
 pub trait MutableGraph: Graph {

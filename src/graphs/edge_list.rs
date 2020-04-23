@@ -36,12 +36,16 @@ impl Graph for EdgeList {
 }
 
 impl EdgeListGraph for EdgeList {
+    type Edges = Vec<Edge>;
+
     fn as_edges(&self) -> &[Edge] {
         &self.edges[..]
     }
+
     fn as_edges_mut(&mut self) -> &mut [Edge] {
         &mut self.edges[..]
     }
+
     fn into_edges(self) -> Vec<Edge> {
         self.edges
     }
