@@ -12,7 +12,6 @@ rand = "0.7.x"
 rand_distr = "0.2.x"
 static_assertions = "1.1.x"
 rustc-hash = "1.1.x"
-ahash = "0.3.x"
 
 [dev-dependencies]
 criterion = "0.3"

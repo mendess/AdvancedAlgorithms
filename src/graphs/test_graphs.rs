@@ -6,8 +6,7 @@ use rand::{
     Rng,
 };
 use rand_distr::Binomial;
-// use rustc_hash::FxHashSet as HashSet;
-use ahash::AHashSet as HashSet;
+use rustc_hash::FxHashSet as HashSet;
 use std::{
     convert::TryInto,
     ops::{Div, Mul, Sub},
