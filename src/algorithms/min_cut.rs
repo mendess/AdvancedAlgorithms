@@ -104,18 +104,15 @@ pub mod karger_stein {
         } else {
             let t = 1 + (ds.components() as f64 / 2.0_f64.sqrt()) as usize;
             let mut updateable_node = current_node;
-            let clone = ds.clone();
             ds.save_state();
             contract(edges, ds, t, &mut updateable_node);
             let m = fast_min_cut(edges, ds, updateable_node);
             ds.restore_state();
-            assert_eq!(&clone, ds);
             ds.save_state();
             updateable_node = current_node;
             contract(edges, ds, t, &mut updateable_node);
             let m = m.min(fast_min_cut(edges, ds, updateable_node));
             ds.restore_state();
-            assert_eq!(&clone, ds);
             m
         }
     }
