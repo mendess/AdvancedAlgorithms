@@ -1,6 +1,5 @@
 use super::{Graph, Vertex};
 use crate::graph;
-use itertools::Itertools;
 use rand::{
     distributions::{uniform::SampleUniform, Distribution, Uniform},
     Rng,
@@ -62,47 +61,41 @@ pub fn graph_one<G: Graph<NodeId = usize>>() -> G {
     })
 }
 
-pub fn random_graph<G, N, R>(n: N, m: usize, rng: R) -> G
+pub fn random_graph<G, N, R>(n: N, m: usize, mut rng: R) -> G
 where
     G: Graph<NodeId = N>,
     N: Vertex + SampleUniform,
     R: Rng,
 {
     let mut set: HashSet<_> = Default::default();
-    let edges = Uniform::from(N::from(0)..n)
-        .sample_iter(rng)
-        .chunks(2)
-        .into_iter()
-        .map(|mut a| {
-            let a0 = a.next().unwrap();
-            let a1 = a.next().unwrap();
-            (a0, a1)
-        })
-        .filter(|a| set.insert(*a))
-        .take(m)
-        .collect::<Vec<_>>();
+    let mut edges = Vec::with_capacity(m);
+    let dist = Uniform::from(N::from(0)..n);
+    while edges.len() < n.into() {
+        let a0 = dist.sample(&mut rng);
+        let a1 = dist.sample(&mut rng);
+        if set.insert((a0, a1)) {
+            edges.push((a0, a1))
+        }
+    }
 
     G::new(n.into(), edges.into_iter())
 }
 
-pub fn random_graph_concrete<G, R>(n: usize, m: usize, rng: R) -> G
+pub fn random_graph_concrete<G, R>(n: usize, m: usize, mut rng: R) -> G
 where
     G: Graph<NodeId = usize>,
     R: Rng,
 {
     let mut set: HashSet<_> = Default::default();
-    let edges = Uniform::from(0..n)
-        .sample_iter(rng)
-        .chunks(2)
-        .into_iter()
-        .map(|mut a| {
-            let a0 = a.next().unwrap();
-            let a1 = a.next().unwrap();
-            (a0, a1)
-        })
-        .filter(|a| set.insert(*a))
-        .take(m)
-        .collect::<Vec<_>>();
+    let mut edges = Vec::with_capacity(m);
+    let dist = Uniform::from(0..n);
+    while edges.len() < n {
+        let a0 = dist.sample(&mut rng);
+        let a1 = dist.sample(&mut rng);
+        if set.insert((a0, a1)) {
+            edges.push((a0, a1))
+        }
+    }
 
     G::new(n.into(), edges.into_iter())
 }
