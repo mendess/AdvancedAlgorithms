@@ -6,8 +6,8 @@ use rand::{
     Rng,
 };
 use rand_distr::Binomial;
+use rustc_hash::FxHashSet as HashSet;
 use std::{
-    collections::HashSet,
     convert::TryInto,
     ops::{Div, Mul, Sub},
 };
@@ -68,7 +68,7 @@ where
     N: Vertex + SampleUniform,
     R: Rng,
 {
-    let mut set = HashSet::new();
+    let mut set: HashSet<_> = Default::default();
     let edges = Uniform::from(N::from(0)..n)
         .sample_iter(rng)
         .chunks(2)
@@ -90,7 +90,7 @@ where
     G: Graph<NodeId = usize>,
     R: Rng,
 {
-    let mut set = HashSet::new();
+    let mut set: HashSet<_> = Default::default();
     let edges = Uniform::from(0..n)
         .sample_iter(rng)
         .chunks(2)
