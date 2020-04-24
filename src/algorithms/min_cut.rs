@@ -76,16 +76,16 @@ pub mod karger_stein {
         }
     }
 
-    pub fn karger<G>(edges: &mut G, n_nodes: usize) -> usize
+    pub fn karger<G>(edges: &mut G) -> usize
     where
         G: EdgeListGraph,
-        G::NodeId: Into<usize> + Copy,
     {
+        let n_vert = edges.vertices();
         let mut edges = edges.as_edges_mut();
-        let log = (!n_nodes).trailing_zeros();
+        let log = (!n_vert).trailing_zeros();
         let runs = log * log + 2;
         (0..runs)
-            .map(|_| min_cut(&mut edges, SimpleDisjointSet::new(n_nodes), 0))
+            .map(|_| min_cut(&mut edges, SimpleDisjointSet::new(n_vert), 0))
             .min()
             .unwrap()
     }
@@ -117,16 +117,16 @@ pub mod karger_stein {
         }
     }
 
-    pub fn karger_stein<G>(edges: &mut G, n_nodes: usize) -> usize
+    pub fn karger_stein<G>(edges: &mut G) -> usize
     where
         G: EdgeListGraph,
-        G::NodeId: Into<usize> + Copy,
     {
+        let n_vert = edges.vertices();
         let mut edges = edges.as_edges_mut();
-        let log = (!n_nodes).trailing_zeros();
+        let log = (!n_vert).trailing_zeros();
         let runs = log * log + 2;
         (0..runs)
-            .map(|_| fast_min_cut(&mut edges, &mut UndoDisjointSet::new(n_nodes), 0))
+            .map(|_| fast_min_cut(&mut edges, &mut UndoDisjointSet::new(n_vert), 0))
             .min()
             .unwrap()
     }
@@ -139,7 +139,7 @@ mod test {
     #[test]
     fn karger_stein() {
         assert_eq!(
-            super::karger_stein::karger_stein(&mut test_graphs::graph_one::<EdgeList>(), 10),
+            super::karger_stein::karger_stein(&mut test_graphs::graph_one::<EdgeList>()),
             3
         )
     }
@@ -147,16 +147,17 @@ mod test {
     #[test]
     fn karger() {
         assert_eq!(
-            super::karger_stein::karger(&mut test_graphs::graph_one::<EdgeList>(), 10),
+            super::karger_stein::karger(&mut test_graphs::graph_one::<EdgeList>()),
             3
         )
     }
 
     #[test]
     fn karget_stein_random() {
-        super::karger_stein::karger_stein(
-            &mut test_graphs::random_graph_er::<EdgeList, usize, _>(10, 0.2, thread_rng()),
+        super::karger_stein::karger_stein(&mut test_graphs::random_graph_er::<EdgeList, usize, _>(
             10,
-        );
+            0.2,
+            thread_rng(),
+        ));
     }
 }
