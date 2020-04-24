@@ -139,7 +139,7 @@ mod test {
     #[test]
     fn karger_stein() {
         assert_eq!(
-            super::karger_stein::karger_stein(&mut test_graphs::graph_one::<EdgeList>()),
+            super::karger_stein::karger_stein(&mut test_graphs::graph_one::<EdgeList, usize>()),
             3
         )
     }
@@ -147,7 +147,7 @@ mod test {
     #[test]
     fn karger() {
         assert_eq!(
-            super::karger_stein::karger(&mut test_graphs::graph_one::<EdgeList>()),
+            super::karger_stein::karger(&mut test_graphs::graph_one::<EdgeList, usize>()),
             3
         )
     }
