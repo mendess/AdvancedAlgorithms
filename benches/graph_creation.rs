@@ -68,5 +68,9 @@ pub fn make_graphs(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, make_graphs);
+criterion_group!{
+    name = benches;
+    config = Criterion::default().sample_size(10);
+    targets = make_graphs
+}
 criterion_main!(benches);
