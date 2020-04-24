@@ -73,7 +73,7 @@ where
     while edges.len() < n.into() {
         let a0 = dist.sample(&mut rng);
         let a1 = dist.sample(&mut rng);
-        if set.insert((a0, a1)) {
+        if a0 != a1 && set.insert((a0, a1)) {
             edges.push((a0, a1))
         }
     }
@@ -92,7 +92,7 @@ where
     while edges.len() < n {
         let a0 = dist.sample(&mut rng);
         let a1 = dist.sample(&mut rng);
-        if set.insert((a0, a1)) {
+        if a0 != a1 && set.insert((a0, a1)) {
             edges.push((a0, a1))
         }
     }
