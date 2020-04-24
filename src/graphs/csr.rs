@@ -164,7 +164,7 @@ impl Index<usize> for GraphCSR {
 }
 
 impl Debug for GraphCSR {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.neighbourhoods()
             .enumerate()
             .try_for_each(|(i, s)| writeln!(f, "{}: {}", i, s.iter().format(" -> ")))

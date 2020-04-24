@@ -1,5 +1,5 @@
 use super::{Graph, Vertex};
-use crate::graph;
+use crate::{util::small_hash_map::{SmallSet, Set}, graph};
 use rand::{
     distributions::{uniform::SampleUniform, Distribution, Uniform},
     Rng,
@@ -61,43 +61,78 @@ pub fn graph_one<G: Graph<NodeId = usize>>() -> G {
     })
 }
 
-pub fn random_graph<G, N, R>(n: N, m: usize, mut rng: R) -> G
+pub fn random_graph<G, N, R>(n: N, m: usize, rng: R) -> G
 where
     G: Graph<NodeId = N>,
     N: Vertex + SampleUniform,
     R: Rng,
 {
-    let mut set: HashSet<_> = Default::default();
-    let mut edges = Vec::with_capacity(m);
+    let edges = Vec::with_capacity(m);
     let dist = Uniform::from(N::from(0)..n);
-    while edges.len() < edges.capacity() {
-        let a0 = dist.sample(&mut rng);
-        let a1 = dist.sample(&mut rng);
-        if a0 != a1 && set.insert((a0, a1)) {
-            edges.push((a0, a1))
+    fn run<H, Hs, G, N, R>(
+        n: N,
+        mut edges: Vec<(N, N)>,
+        dist: Uniform<N>,
+        mut rng: R,
+        mut set: H,
+    ) -> G
+    where
+        N: Vertex + SampleUniform,
+        H: Set<(N, N), Hs>,
+        G: Graph<NodeId = N>,
+        R: Rng,
+    {
+        while edges.len() < edges.capacity() {
+            let a0 = dist.sample(&mut rng);
+            let a1 = dist.sample(&mut rng);
+            if a0 != a1 && set.insert((a0, a1)) {
+                edges.push((a0, a1))
+            }
         }
-    }
 
-    G::new(n.into(), edges.into_iter())
+        G::new(n.into(), edges.into_iter())
+    }
+    if m < 50 {
+        run(n, edges, dist, rng, SmallSet::with_capacity(m))
+    } else {
+        run(n, edges, dist, rng, HashSet::with_capacity_and_hasher(m, Default::default()))
+    }
 }
 
-pub fn random_graph_concrete<G, R>(n: usize, m: usize, mut rng: R) -> G
+pub fn random_graph_concrete<G, R>(n: usize, m: usize, rng: R) -> G
 where
     G: Graph<NodeId = usize>,
     R: Rng,
 {
-    let mut set: HashSet<_> = Default::default();
-    let mut edges = Vec::with_capacity(m);
+    let edges = Vec::with_capacity(m);
     let dist = Uniform::from(0..n);
-    while edges.len() < edges.capacity() {
-        let a0 = dist.sample(&mut rng);
-        let a1 = dist.sample(&mut rng);
-        if a0 != a1 && set.insert((a0, a1)) {
-            edges.push((a0, a1))
+    fn run<H, Hs, G, R>(
+        n: usize,
+        mut edges: Vec<(usize, usize)>,
+        dist: Uniform<usize>,
+        mut rng: R,
+        mut set: H,
+    ) -> G
+    where
+        H: Set<(usize, usize), Hs>,
+        G: Graph<NodeId = usize>,
+        R: Rng,
+    {
+        while edges.len() < edges.capacity() {
+            let a0 = dist.sample(&mut rng);
+            let a1 = dist.sample(&mut rng);
+            if a0 != a1 && set.insert((a0, a1)) {
+                edges.push((a0, a1))
+            }
         }
-    }
 
-    G::new(n.into(), edges.into_iter())
+        G::new(n, edges.into_iter())
+    }
+    if m < 50 {
+        run(n, edges, dist, rng, SmallSet::with_capacity(m))
+    } else {
+        run(n, edges, dist, rng, HashSet::with_capacity_and_hasher(m, Default::default()))
+    }
 }
 
 /// Generates a graph using the Evdos Ronmi method.

@@ -115,7 +115,7 @@ impl Index<usize> for Adjacency {
 }
 
 impl Debug for Adjacency {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.neighbourhoods()
             .try_for_each(|(i, s)| writeln!(f, "{}: {}", i, s.format(" -> ")))
     }
