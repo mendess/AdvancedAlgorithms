@@ -1,4 +1,4 @@
-use super::{ContractableGraph, Graph, MutableGraph};
+use super::{ContractableGraph, Graph, MutableGraph, Vertex};
 use itertools::Itertools;
 use rand::{seq::IteratorRandom, Rng};
 use std::{
@@ -7,25 +7,28 @@ use std::{
     ops::Index,
 };
 
-type Neighbours = HashSet<usize>;
+type Neighbours<N> = HashSet<N>;
 
 #[derive(Clone)]
-pub struct Adjacency {
-    matrix: HashMap<usize, Neighbours>,
+pub struct Adjacency<N = usize> {
+    matrix: HashMap<N, Neighbours<N>>,
     missing_links: usize,
     n_edges: usize,
     n_vertices: usize,
 }
 
-type NodeId = <Adjacency as Graph>::NodeId;
-type Edge = super::Edge<NodeId>;
+type NodeId<N> = <Adjacency<N> as Graph>::NodeId;
+type Edge<N> = super::Edge<NodeId<N>>;
 
-impl Graph for Adjacency {
-    type NodeId = usize;
+impl<N> Graph for Adjacency<N>
+where
+    N: Vertex,
+{
+    type NodeId = N;
 
     fn new<I>(n_vertices: usize, edges: I) -> Self
     where
-        I: ExactSizeIterator<Item = Edge>,
+        I: ExactSizeIterator<Item = Edge<N>>,
     {
         let mut s = Self {
             matrix: Default::default(),
@@ -34,7 +37,7 @@ impl Graph for Adjacency {
             n_vertices,
         };
         for i in 0..n_vertices {
-            s.matrix.insert(i, Default::default());
+            s.matrix.insert(N::from(i), Default::default());
         }
         edges.for_each(|(from, to)| {
             s.add_link(from, to);
@@ -50,7 +53,7 @@ impl Graph for Adjacency {
         self.n_edges
     }
 
-    fn random_edge<R: Rng>(&self, mut rng: R) -> Edge {
+    fn random_edge<R: Rng>(&self, mut rng: R) -> Edge<N> {
         self.matrix
             .iter()
             .flat_map(|(&i, neigh)| neigh.iter().map(move |&j| (i, j)))
@@ -59,10 +62,13 @@ impl Graph for Adjacency {
     }
 }
 
-impl MutableGraph for Adjacency {
+impl<N> MutableGraph for Adjacency<N>
+where
+    N: Vertex,
+{
     fn parcial<I>(n_vertices: usize, n_links: usize, edges: I) -> Self
     where
-        I: IntoIterator<Item = Edge>,
+        I: IntoIterator<Item = Edge<N>>,
     {
         let mut s = Self {
             matrix: Default::default(),
@@ -71,7 +77,7 @@ impl MutableGraph for Adjacency {
             n_vertices,
         };
         for i in 0..n_vertices {
-            s.matrix.insert(i, Default::default());
+            s.matrix.insert(N::from(i), Default::default());
         }
         edges.into_iter().for_each(|(from, to)| {
             s.add_link(from, to);
@@ -79,7 +85,7 @@ impl MutableGraph for Adjacency {
         s
     }
 
-    fn add_link(&mut self, from: usize, to: usize) -> bool {
+    fn add_link(&mut self, from: N, to: N) -> bool {
         if self.missing_links == 0 {
             false
         } else if let Some(neigh) = self.matrix.get_mut(&from) {
@@ -92,9 +98,12 @@ impl MutableGraph for Adjacency {
     }
 }
 
-impl ContractableGraph for Adjacency {
-    fn contract(&mut self, (start, end): Edge) {
-        let old_neigh: Neighbours = self.matrix.remove(&end).expect("End doesn't exist");
+impl<N> ContractableGraph for Adjacency<N>
+where
+    N: Vertex,
+{
+    fn contract(&mut self, (start, end): Edge<N>) {
+        let old_neigh = self.matrix.remove(&end).expect("End doesn't exist");
         if let Some(neigh) = self.matrix.get_mut(&start) {
             neigh.extend(old_neigh.iter().filter(|&n| *n != start));
         }
@@ -107,26 +116,35 @@ impl ContractableGraph for Adjacency {
     }
 }
 
-impl Index<usize> for Adjacency {
-    type Output = Neighbours;
-    fn index(&self, u: usize) -> &Self::Output {
+impl<N> Index<N> for Adjacency<N>
+where
+    N: Vertex,
+{
+    type Output = Neighbours<N>;
+    fn index(&self, u: N) -> &Self::Output {
         &self.matrix[&u]
     }
 }
 
-impl Debug for Adjacency {
+impl<N> Debug for Adjacency<N>
+where
+    N: Vertex + Debug,
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.neighbourhoods()
-            .try_for_each(|(i, s)| writeln!(f, "{}: {}", i, s.format(" -> ")))
+            .try_for_each(|(i, s)| writeln!(f, "{:?}: {:?}", i, s.format(" -> ")))
     }
 }
 
-impl Adjacency {
-    pub fn neighbours(&self, node: NodeId) -> impl Iterator<Item = &<Self as Graph>::NodeId> {
+impl<N> Adjacency<N>
+where
+    N: Vertex,
+{
+    pub fn neighbours(&self, node: NodeId<N>) -> impl Iterator<Item = &<Self as Graph>::NodeId> {
         self.matrix[&node].iter()
     }
 
-    pub fn neighbourhoods(&self) -> impl Iterator<Item = (&usize, impl Iterator<Item = &usize>)> {
+    pub fn neighbourhoods(&self) -> impl Iterator<Item = (&N, impl Iterator<Item = &N>)> {
         self.matrix
             .iter()
             .map(|(start, neigh)| (start, neigh.iter()))

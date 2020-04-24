@@ -9,11 +9,11 @@ pub type Edge<N> = (N, N);
 
 pub trait Vertex
 where
-    Self: Copy + std::hash::Hash + Eq + From<u8> + Into<usize> + PartialOrd,
+    Self: Copy + std::hash::Hash + Eq + From<usize> + Into<usize> + PartialOrd,
 {
 }
 
-impl<T> Vertex for T where T: Copy + std::hash::Hash + Eq + From<u8> + Into<usize> + PartialOrd {}
+impl<T> Vertex for T where T: Copy + std::hash::Hash + Eq + From<usize> + Into<usize> + PartialOrd {}
 
 pub trait Graph {
     type NodeId: Vertex;

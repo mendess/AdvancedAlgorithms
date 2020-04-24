@@ -1,20 +1,23 @@
-use crate::graphs::{EdgeListGraph, Graph, MutableGraph};
+use crate::graphs::{EdgeListGraph, Graph, MutableGraph, Vertex};
 use rand::{seq::SliceRandom, Rng};
 
-type NodeId = <EdgeList as Graph>::NodeId;
-type Edge = super::Edge<NodeId>;
+type NodeId<N> = <EdgeList<N> as Graph>::NodeId;
+type Edge<N> = super::Edge<NodeId<N>>;
 
-pub struct EdgeList {
-    edges: Vec<Edge>,
+pub struct EdgeList<N: Vertex = usize> {
+    edges: Vec<Edge<N>>,
     n_vertices: usize,
 }
 
-impl Graph for EdgeList {
-    type NodeId = usize;
+impl<N> Graph for EdgeList<N>
+where
+    N: Vertex,
+{
+    type NodeId = N;
 
     fn new<I>(n_vertices: usize, edges: I) -> Self
     where
-        I: ExactSizeIterator<Item = Edge>,
+        I: ExactSizeIterator<Item = Edge<N>>,
     {
         Self {
             n_vertices,
@@ -30,31 +33,37 @@ impl Graph for EdgeList {
         self.edges.len()
     }
 
-    fn random_edge<R: Rng>(&self, mut rng: R) -> Edge {
+    fn random_edge<R: Rng>(&self, mut rng: R) -> Edge<N> {
         *self.edges.choose(&mut rng).unwrap()
     }
 }
 
-impl EdgeListGraph for EdgeList {
-    type Edges = Vec<Edge>;
+impl<N> EdgeListGraph for EdgeList<N>
+where
+    N: Vertex,
+{
+    type Edges = Vec<Edge<N>>;
 
-    fn as_edges(&self) -> &[Edge] {
+    fn as_edges(&self) -> &[Edge<N>] {
         &self.edges[..]
     }
 
-    fn as_edges_mut(&mut self) -> &mut [Edge] {
+    fn as_edges_mut(&mut self) -> &mut [Edge<N>] {
         &mut self.edges[..]
     }
 
-    fn into_edges(self) -> Vec<Edge> {
+    fn into_edges(self) -> Vec<Edge<N>> {
         self.edges
     }
 }
 
-impl MutableGraph for EdgeList {
+impl<N> MutableGraph for EdgeList<N>
+where
+    N: Vertex,
+{
     fn parcial<I>(n_vertices: usize, n_links: usize, edges: I) -> Self
     where
-        I: IntoIterator<Item = Edge>,
+        I: IntoIterator<Item = Edge<N>>,
     {
         let mut elist = Vec::with_capacity(n_links);
         elist.extend(edges);
