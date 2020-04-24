@@ -70,7 +70,7 @@ where
     let mut set: HashSet<_> = Default::default();
     let mut edges = Vec::with_capacity(m);
     let dist = Uniform::from(N::from(0)..n);
-    while edges.len() < n.into() {
+    while edges.len() < edges.capacity() {
         let a0 = dist.sample(&mut rng);
         let a1 = dist.sample(&mut rng);
         if a0 != a1 && set.insert((a0, a1)) {
@@ -89,7 +89,7 @@ where
     let mut set: HashSet<_> = Default::default();
     let mut edges = Vec::with_capacity(m);
     let dist = Uniform::from(0..n);
-    while edges.len() < n {
+    while edges.len() < edges.capacity() {
         let a0 = dist.sample(&mut rng);
         let a1 = dist.sample(&mut rng);
         if a0 != a1 && set.insert((a0, a1)) {
