@@ -9,8 +9,8 @@ pub fn random_graph_er_bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("RandomGraphER");
     let params = (1..=9)
         .map(|i| i * 100)
-        .zip(&[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7])
-        .map(|(n, &p)| (n, p, (n as f64) * p))
+        .flat_map(|n| [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7].iter().map(move |&p| (n, p)))
+        .map(|(n, p)| (n, p, (n as f64) * p))
         .map(|(n, p, e)| (n, p, e.floor() as usize))
         .collect::<Vec<_>>();
     for (n, p, e) in params {
