@@ -1,30 +1,11 @@
-use crate::graphs::{EdgeListGraph, Graph, MutableGraph, Vertex};
-use rand::{seq::SliceRandom, Rng};
+use crate::graphs::{Edge, EdgeListGraph, FromEdges, Graph, GraphWeighted, WEdge};
 
-type NodeId<N> = <EdgeList<N> as Graph>::NodeId;
-type Edge<N> = super::Edge<NodeId<N>>;
-
-pub struct EdgeList<N: Vertex = usize> {
-    edges: Vec<Edge<N>>,
+pub struct EdgeList<N = (), E = ()> {
+    edges: Vec<WEdge<N, E>>,
     n_vertices: usize,
 }
 
-impl<N> Graph for EdgeList<N>
-where
-    N: Vertex,
-{
-    type NodeId = N;
-
-    fn new<I>(n_vertices: usize, edges: I) -> Self
-    where
-        I: ExactSizeIterator<Item = Edge<N>>,
-    {
-        Self {
-            n_vertices,
-            edges: edges.collect(),
-        }
-    }
-
+impl<N, E> Graph for EdgeList<N, E> {
     fn vertices(&self) -> usize {
         self.n_vertices
     }
@@ -32,52 +13,58 @@ where
     fn edges(&self) -> usize {
         self.edges.len()
     }
+}
 
-    fn random_edge<R: Rng>(&self, mut rng: R) -> Edge<N> {
-        *self.edges.choose(&mut rng).unwrap()
+impl<N, E> GraphWeighted for EdgeList<N, E> {
+    type NodeWeight = N;
+    type EdgeWeight = E;
+}
+
+impl FromEdges for EdgeList<(), ()> {
+    fn from_edges<I>(n: usize, edges: I) -> Self
+    where
+        I: ExactSizeIterator<Item = Edge>,
+    {
+        Self {
+            n_vertices: n,
+            edges: edges.map(|e| (e.0, e.1, (), ())).collect(),
+        }
     }
 }
 
-impl<N> EdgeListGraph for EdgeList<N>
-where
-    N: Vertex,
-{
-    type Edges = Vec<Edge<N>>;
+impl<N, E> EdgeListGraph<N, E> for EdgeList<N, E> {
+    type Edges = Vec<WEdge<N, E>>;
 
-    fn as_edges(&self) -> &[Edge<N>] {
+    fn as_edges(&self) -> &[WEdge<N, E>] {
         &self.edges[..]
     }
 
-    fn as_edges_mut(&mut self) -> &mut [Edge<N>] {
+    fn as_edges_mut(&mut self) -> &mut [WEdge<N, E>] {
         &mut self.edges[..]
     }
 
-    fn into_edges(self) -> Vec<Edge<N>> {
+    fn into_edges(self) -> Vec<WEdge<N, E>> {
         self.edges
     }
 }
 
-impl<N> MutableGraph for EdgeList<N>
-where
-    N: Vertex,
-{
-    fn parcial<I>(n_vertices: usize, n_links: usize, edges: I) -> Self
-    where
-        I: IntoIterator<Item = Edge<N>>,
-    {
-        let mut elist = Vec::with_capacity(n_links);
-        elist.extend(edges);
-        Self {
-            n_vertices,
-            edges: elist,
-        }
-    }
-
-    fn add_link(&mut self, from: Self::NodeId, to: Self::NodeId) -> bool {
+impl EdgeList<(), ()> {
+    pub fn add_link(&mut self, from: usize, to: usize) -> bool {
         if self.edges.capacity() == self.edges.len() {
             false
         } else {
-            self.edges.push((from, to));
+            self.edges.push((from, to, (), ()));
+            true
+        }
+    }
+}
+
+impl<N, E> EdgeList<N, E> {
+    pub fn add_link_weights(&mut self, from: usize, to: usize, n: N, e: E) -> bool {
+        if self.edges.capacity() == self.edges.len() {
+            false
+        } else {
+            self.edges.push((from, to, n, e));
             true
         }
     }

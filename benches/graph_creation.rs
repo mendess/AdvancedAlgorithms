@@ -1,5 +1,5 @@
 use aava::graphs::{
-    csr::GraphCSR, edge_list::EdgeList, matrix::Adjacency, test_graphs::random_graph_er,
+    csr::CSR, edge_list::EdgeList, matrix::Adjacency, test_graphs::random_graph_er,
 };
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use rand::{distributions::Distribution, rngs::SmallRng, SeedableRng};
@@ -30,7 +30,7 @@ pub fn make_graphs(c: &mut Criterion) {
             &(n, p),
             |b, &i| {
                 b.iter_with_large_drop(|| {
-                    random_graph_er::<EdgeList, usize, _>(
+                    random_graph_er::<EdgeList, _>(
                         i.0,
                         i.1,
                         black_box(SmallRng::seed_from_u64(0x0DDB1A5E5BAD5EEDu64)),
@@ -43,7 +43,7 @@ pub fn make_graphs(c: &mut Criterion) {
             &(n, p),
             |b, &i| {
                 b.iter_with_large_drop(|| {
-                    random_graph_er::<Adjacency, usize, _>(
+                    random_graph_er::<Adjacency, _>(
                         i.0,
                         i.1,
                         black_box(SmallRng::seed_from_u64(0x0DDB1A5E5BAD5EEDu64)),
@@ -56,7 +56,7 @@ pub fn make_graphs(c: &mut Criterion) {
             &(n, p),
             |b, &i| {
                 b.iter_with_large_drop(|| {
-                    random_graph_er::<GraphCSR, usize, _>(
+                    random_graph_er::<CSR, _>(
                         i.0,
                         i.1,
                         black_box(SmallRng::seed_from_u64(0x0DDB1A5E5BAD5EEDu64)),
@@ -68,7 +68,7 @@ pub fn make_graphs(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!{
+criterion_group! {
     name = benches;
     config = Criterion::default().sample_size(10);
     targets = make_graphs

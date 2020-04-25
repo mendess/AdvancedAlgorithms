@@ -3,55 +3,37 @@ pub mod edge_list;
 pub mod matrix;
 pub mod test_graphs;
 
-use rand::Rng;
-
-pub type Edge<N> = (N, N);
-
-pub trait Vertex
-where
-    Self: Copy + std::hash::Hash + Eq + From<usize> + Into<usize> + PartialOrd,
-{
-}
-
-impl<T> Vertex for T where T: Copy + std::hash::Hash + Eq + From<usize> + Into<usize> + PartialOrd {}
-
 pub trait Graph {
-    type NodeId: Vertex;
-
-    fn new<I>(n_vertices: usize, edges: I) -> Self
-    where
-        I: ExactSizeIterator<Item = Edge<Self::NodeId>>;
-
     fn vertices(&self) -> usize;
     fn edges(&self) -> usize;
-    fn random_edge<R: Rng>(&self, rng: R) -> Edge<Self::NodeId>;
 }
 
-pub trait EdgeListGraph: Graph {
-    type Edges: IntoIterator<Item = Edge<Self::NodeId>>;
+pub trait GraphWeighted: Graph {
+    type NodeWeight;
+    type EdgeWeight;
+}
 
-    fn as_edges(&self) -> &[Edge<Self::NodeId>];
-    fn as_edges_mut(&mut self) -> &mut [Edge<Self::NodeId>];
+pub type Edge = WEdge<(), ()>;
+pub type WEdge<N, E> = (usize, usize, N, E);
+
+pub trait FromEdges: Graph {
+    fn from_edges<I>(n: usize, list: I) -> Self
+    where
+        I: ExactSizeIterator<Item = Edge>;
+}
+
+pub trait FromEdgesWeighted: GraphWeighted {
+    fn from_edges<I>(n: usize, list: I) -> Self
+    where
+        I: ExactSizeIterator<Item = WEdge<Self::NodeWeight, Self::EdgeWeight>>;
+}
+
+pub trait EdgeListGraph<N, E>: GraphWeighted {
+    type Edges: IntoIterator<Item = WEdge<Self::NodeWeight, Self::EdgeWeight>>;
+
+    fn as_edges(&self) -> &[WEdge<Self::NodeWeight, Self::EdgeWeight>];
+    fn as_edges_mut(&mut self) -> &mut [WEdge<Self::NodeWeight, Self::EdgeWeight>];
     fn into_edges(self) -> Self::Edges;
-}
-
-pub trait MutableGraph: Graph {
-    fn parcial<I>(n_vertices: usize, n_links: usize, edges: I) -> Self
-    where
-        I: IntoIterator<Item = Edge<Self::NodeId>>;
-
-    fn empty(n_vertices: usize, n_links: usize) -> Self
-    where
-        Self: Sized,
-    {
-        MutableGraph::parcial(n_vertices, n_links, std::iter::empty())
-    }
-
-    fn add_link(&mut self, from: Self::NodeId, to: Self::NodeId) -> bool;
-}
-
-pub trait ContractableGraph: MutableGraph {
-    fn contract(&mut self, edge: Edge<Self::NodeId>);
 }
 
 pub struct ExactSizeIter<I> {
@@ -92,18 +74,18 @@ impl<I: Iterator> ToExactSizeIter for I {}
 
 #[macro_export]
 macro_rules! graph {
-    ( $graph:ty = ($n_vertices:expr, $n_links:expr) { $($from:expr => $to:expr);*$(;)? }) => (
-        ::static_assertions::const_assert!($n_links >= <[_]>::len(&[$($from),*]));
-        <$graph as $crate::graphs::MutableGraph>::parcial(
-            $n_vertices,
-            $n_links,
-            [$(($from, $to),)*].iter().map(|&x| x)
-        )
-    );
     ( $graph:ty = ($n_vertices:expr $(, _)?) { $($from:expr => $to:expr);*$(;)? }) => (
-        <$graph as $crate::graphs::Graph>::new(
+        <$graph as $crate::graphs::FromEdges>::from_edges(
             $n_vertices,
-            [$(($from, $to),)*].iter().map(|&x| x)
+            [$(($from, $to, (), ()),)*].iter().map(|&x| x)
         )
     );
 }
+// ( $graph:ty = ($n_vertices:expr, $n_links:expr) { $($from:expr => $to:expr);*$(;)? }) => (
+//     ::static_assertions::const_assert!($n_links >= <[_]>::len(&[$($from),*]));
+//     <$graph as $crate::graphs::FromEdges>::parcial(
+//         $n_vertices,
+//         $n_links,
+//         [$(($from, $to),)*].iter().map(|&x| x)
+//     )
+// );

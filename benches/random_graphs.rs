@@ -1,7 +1,4 @@
-use aava::graphs::{
-    edge_list::EdgeList,
-    test_graphs::{random_graph_er, random_graph_er_concrete},
-};
+use aava::graphs::{edge_list::EdgeList, test_graphs::random_graph_er};
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use rand::{distributions::Distribution, rngs::SmallRng, SeedableRng};
 use rand_distr::Binomial;
@@ -34,20 +31,7 @@ pub fn random_graph_er_bench(c: &mut Criterion) {
             &(n, p),
             |b, &i| {
                 b.iter(|| {
-                    random_graph_er::<EdgeList, usize, _>(
-                        i.0,
-                        i.1,
-                        black_box(SmallRng::seed_from_u64(0x0DDB1A5E5BAD5EEDu64)),
-                    )
-                })
-            },
-        );
-        group.bench_with_input(
-            BenchmarkId::new("concrete", format!("{}_{}_{}", n, p, e)),
-            &(n, p),
-            |b, &i| {
-                b.iter(|| {
-                    random_graph_er_concrete::<EdgeList, _>(
+                    random_graph_er::<EdgeList, _>(
                         i.0,
                         i.1,
                         black_box(SmallRng::seed_from_u64(0x0DDB1A5E5BAD5EEDu64)),
