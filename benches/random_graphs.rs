@@ -43,5 +43,9 @@ pub fn random_graph_er_bench(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(benches, random_graph_er_bench);
+criterion_group! {
+    name = benches;
+    config = Criterion::default().sample_size(10);
+    targets = random_graph_er_bench
+}
 criterion_main!(benches);

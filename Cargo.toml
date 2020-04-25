@@ -17,9 +17,9 @@ rustc-hash = "1.1.x"
 criterion = "0.3"
 rand = { version = "0.7.x", features = ["small_rng"] }
 
-# [[bench]]
-# name = "random_graphs"
-# harness = false
+[[bench]]
+name = "random_graphs"
+harness = false
 
 [[bench]]
 name = "graph_creation"

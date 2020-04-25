@@ -17,7 +17,7 @@ pub struct Adjacency {
 
 impl Graph for Adjacency {
     fn vertices(&self) -> usize {
-        self.n_vertices.into()
+        self.n_vertices
     }
 
     fn edges(&self) -> usize {

@@ -73,8 +73,8 @@ where
             edges.push((a0, a1, (), ()))
         }
     }
-
-    G::from_edges(n.into(), edges.into_iter())
+    edges.sort_unstable();
+    G::from_edges(n, edges.into_iter())
 }
 
 /// Generates a graph using the Evdos Ronmi method.
@@ -93,7 +93,6 @@ where
     R: Rng,
     G: FromEdges,
 {
-    let nn: usize = n.into();
-    let dist = Binomial::new((nn * (nn - 1) / 2).try_into().unwrap(), p).unwrap();
+    let dist = Binomial::new((n * (n - 1) / 2).try_into().unwrap(), p).unwrap();
     random_graph(n, (dist.sample(&mut rng)).try_into().unwrap(), rng)
 }
