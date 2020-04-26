@@ -22,5 +22,9 @@ name = "random_graphs"
 harness = false
 
 [[bench]]
+name = "min_cut"
+harness = false
+
+[[bench]]
 name = "graph_creation"
 harness = false
