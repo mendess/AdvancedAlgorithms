@@ -8,7 +8,7 @@ use rand_distr::Binomial;
 use rustc_hash::FxHashSet as HashSet;
 use std::convert::TryInto;
 
-pub fn graph_one<G: FromEdges<(), ()>>() -> G {
+pub fn graph_one<G: FromEdges<NodeWeight = (), EdgeWeight = ()>>() -> G {
     graph!(G = (10) {
        0 => 1;
        0 => 2;

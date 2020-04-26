@@ -4,32 +4,23 @@ pub mod matrix;
 pub mod test_graphs;
 
 pub trait Graph {
-    fn vertices(&self) -> usize;
-    fn edges(&self) -> usize;
-}
-
-pub trait GraphWeighted: Graph {
     type NodeWeight;
     type EdgeWeight;
+    fn vertices(&self) -> usize;
+    fn edges(&self) -> usize;
 }
 
 pub type Edge = WEdge<(), ()>;
 pub type WEdge<N, E> = (usize, usize, N, E);
 
-pub trait FromEdges<N, E>: Graph {
+pub trait FromEdges: Graph {
     fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
-        I: IntoIterator<IntoIter = Iter, Item = WEdge<N, E>>,
-        Iter: ExactSizeIterator<Item = WEdge<N, E>>;
+        I: IntoIterator<IntoIter = Iter, Item = WEdge<Self::NodeWeight, Self::EdgeWeight>>,
+        Iter: ExactSizeIterator<Item = WEdge<Self::NodeWeight, Self::EdgeWeight>>;
 }
 
-// pub trait FromEdgesWeighted: GraphWeighted {
-//     fn from_edges<I>(n: usize, list: I) -> Self
-//     where
-//         I: ExactSizeIterator<Item = WEdge<Self::NodeWeight, Self::EdgeWeight>>;
-// }
-
-pub trait EdgeListGraph<N, E>: GraphWeighted {
+pub trait EdgeListGraph: Graph {
     type Edges: IntoIterator<Item = WEdge<Self::NodeWeight, Self::EdgeWeight>>;
 
     fn as_edges(&self) -> &[WEdge<Self::NodeWeight, Self::EdgeWeight>];
@@ -76,7 +67,7 @@ impl<I: Iterator> ToExactSizeIter for I {}
 #[macro_export]
 macro_rules! graph {
     ( $graph:ty = ($n_vertices:expr $(, _)?) { $($from:expr => $to:expr);*$(;)? }) => (
-        <$graph as $crate::graphs::FromEdges<_, _>>::from_edges(
+        <$graph as $crate::graphs::FromEdges>::from_edges(
             $n_vertices,
             [$(($from, $to, (), ()),)*].iter().map(|&x| x)
         )

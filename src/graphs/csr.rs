@@ -29,6 +29,8 @@ pub struct CSR {
 }
 
 impl Graph for CSR {
+    type NodeWeight = ();
+    type EdgeWeight = ();
     fn vertices(&self) -> usize {
         self.row_indexes.len() - 1
     }
@@ -38,7 +40,7 @@ impl Graph for CSR {
     }
 }
 
-impl FromEdges<(), ()> for CSR {
+impl FromEdges for CSR {
     /// Create a new CSR
     fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where

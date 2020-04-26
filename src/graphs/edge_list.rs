@@ -1,4 +1,4 @@
-use crate::graphs::{EdgeListGraph, FromEdges, Graph, GraphWeighted, WEdge};
+use crate::graphs::{EdgeListGraph, FromEdges, Graph, WEdge};
 
 pub struct EdgeList<N = (), E = ()> {
     edges: Vec<WEdge<N, E>>,
@@ -6,6 +6,8 @@ pub struct EdgeList<N = (), E = ()> {
 }
 
 impl<N, E> Graph for EdgeList<N, E> {
+    type NodeWeight = N;
+    type EdgeWeight = E;
     fn vertices(&self) -> usize {
         self.n_vertices
     }
@@ -15,12 +17,7 @@ impl<N, E> Graph for EdgeList<N, E> {
     }
 }
 
-impl<N, E> GraphWeighted for EdgeList<N, E> {
-    type NodeWeight = N;
-    type EdgeWeight = E;
-}
-
-impl<N, E> FromEdges<N, E> for EdgeList<N, E> {
+impl<N, E> FromEdges for EdgeList<N, E> {
     fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
         I: IntoIterator<IntoIter = Iter, Item = WEdge<N, E>>,
@@ -33,8 +30,8 @@ impl<N, E> FromEdges<N, E> for EdgeList<N, E> {
     }
 }
 
-impl<N, E> EdgeListGraph<N, E> for EdgeList<N, E> {
-    type Edges = Vec<WEdge<N, E>>;
+impl<N, E> EdgeListGraph for EdgeList<N, E> {
+    type Edges = Vec<WEdge<Self::NodeWeight, Self::EdgeWeight>>;
 
     fn as_edges(&self) -> &[WEdge<N, E>] {
         &self.edges[..]
@@ -44,7 +41,7 @@ impl<N, E> EdgeListGraph<N, E> for EdgeList<N, E> {
         &mut self.edges[..]
     }
 
-    fn into_edges(self) -> Vec<WEdge<N, E>> {
+    fn into_edges(self) -> Self::Edges {
         self.edges
     }
 }

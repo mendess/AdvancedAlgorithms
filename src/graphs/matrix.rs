@@ -1,4 +1,4 @@
-use super::{Edge, FromEdges, Graph};
+use super::{Edge,  FromEdges, Graph};
 use itertools::Itertools;
 use std::{
     collections::HashSet,
@@ -16,6 +16,8 @@ pub struct Adjacency {
 }
 
 impl Graph for Adjacency {
+    type NodeWeight = ();
+    type EdgeWeight = ();
     fn vertices(&self) -> usize {
         self.n_vertices
     }
@@ -25,7 +27,7 @@ impl Graph for Adjacency {
     }
 }
 
-impl FromEdges<(), ()> for Adjacency {
+impl FromEdges for Adjacency {
     fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
         I: IntoIterator<IntoIter = Iter, Item = Edge>,
