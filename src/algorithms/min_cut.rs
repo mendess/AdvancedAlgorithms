@@ -55,8 +55,9 @@ where
         let mut ds1 = ds.clone();
         contract(edges, &mut ds1, t, &mut updateable_node);
         let m1 = min_cut(edges, ds1, updateable_node);
+
         updateable_node = current_node;
-        let mut ds2 = ds.clone();
+        let mut ds2 = ds;
         contract(edges, &mut ds2, t, &mut updateable_node);
         let m2 = min_cut(edges, ds2, updateable_node);
         if m1.len() < m2.len() {
@@ -102,6 +103,7 @@ where
         contract(edges, ds, t, &mut updateable_node);
         let m1 = fast_min_cut(edges, ds, updateable_node);
         ds.restore_state();
+
         ds.save_state();
         updateable_node = current_node;
         contract(edges, ds, t, &mut updateable_node);
