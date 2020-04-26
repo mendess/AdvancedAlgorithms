@@ -25,10 +25,14 @@ impl DisjointSet for SimpleDisjointSet {
         }
     }
 
-    fn find(&mut self, id: usize) -> usize {
-        if self.ids[id] != id {
-            self.ids[id] = self.find(self.ids[id]);
+    fn find(&mut self, mut id: usize) -> usize {
+        while self.ids[id] != id {
+            id = self.ids[id]
         }
+
+        // if self.ids[id] != id {
+        //     self.ids[id] = self.find(self.ids[id])
+        // }
         self.ids[id]
     }
 
@@ -125,10 +129,7 @@ impl DisjointSet for UndoDisjointSet {
             components: num_sets,
             num_sets,
             nodes: (0..num_sets)
-                .map(|i| Node {
-                    id: i,
-                    rank: 1,
-                })
+                .map(|i| Node { id: i, rank: 1 })
                 .collect::<Vec<_>>()
                 .into(),
             history: Default::default(),
@@ -157,7 +158,8 @@ impl DisjointSet for UndoDisjointSet {
         if nodes[parent].rank < nodes[child].rank {
             std::mem::swap(&mut parent, &mut child)
         }
-        self.history.push(Change::new(parent, nodes[parent]).changed());
+        self.history
+            .push(Change::new(parent, nodes[parent]).changed());
         self.history.push(Change::new(child, nodes[child]));
         nodes[child].id = parent;
         nodes[parent].rank += 1;
@@ -178,6 +180,105 @@ impl UndoDisjointSet {
         while let Some(Operation::Change(c)) = self.history.pop() {
             self.nodes[c.id] = c.old_state;
             self.components += usize::from(c.components_changed);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn undo_union_test() {
+        let mut ds = UndoDisjointSet::new(10);
+        let anchor = ds.clone();
+        ds.save_state();
+        ds.union(0, 3);
+        ds.union(2, 4);
+        ds.union(0, 6);
+        ds.union(9, 1);
+        ds.restore_state();
+        assert_eq!(ds, anchor)
+    }
+
+    #[test]
+    fn undo_find_test() {
+        let ds = UndoDisjointSet::new(10);
+        assert_eq!(find_test(ds.clone()), ds)
+    }
+
+    #[test]
+    fn undo_union_find_test() {
+        let mut ds = UndoDisjointSet::new(10);
+        let anchor = ds.clone();
+        ds.save_state();
+        ds.union(3, 6);
+        ds.find(3);
+        ds.find(6);
+        ds.union(2, 4);
+        ds.find(2);
+        ds.find(4);
+        ds.restore_state();
+        assert_eq!(ds, anchor)
+    }
+
+    #[test]
+    fn undo_connected_test() {
+        connected_test(UndoDisjointSet::new(10))
+    }
+
+    #[test]
+    fn simple_union_test() {
+        let mut ds = SimpleDisjointSet::new(10);
+        ds.union(0, 3);
+        ds.union(2, 4);
+        ds.union(0, 6);
+        ds.union(9, 1);
+        ds.union(0, 9);
+    }
+
+    #[test]
+    fn simple_find_test() {
+        find_test(SimpleDisjointSet::new(10));
+    }
+
+    #[test]
+    fn simple_connected_test() {
+        connected_test(SimpleDisjointSet::new(10))
+    }
+
+    #[cfg(test)]
+    fn find_test<D: DisjointSet>(mut ds: D) -> D {
+        for i in 0..10 {
+            assert_eq!(i, ds.find(i));
+        }
+        ds
+    }
+    #[cfg(test)]
+    fn connected_test<D: DisjointSet>(mut ds: D) {
+        ds.union(3, 6);
+        assert!(ds.are_connected(3, 6));
+        ds.union(2, 4);
+        assert!(ds.are_connected(2, 4));
+        ds.union(2, 3);
+        for i in (0..10).filter(|i| [2, 3, 4, 6].contains(&i)) {
+            for j in (0..10).filter(|i| [2, 3, 4, 6].contains(&i)) {
+                assert!(ds.are_connected(i, j), "{} <-> {}", i, j);
+            }
+        }
+        for i in (0..10).filter(|i| ![2, 3, 4, 6].contains(&i)) {
+            for &j in &[2, 3, 4, 6] {
+                if i != j {
+                    assert!(!ds.are_connected(i, j), "{} <-> {}", i, j);
+                }
+            }
+        }
+        for &i in &[2, 3, 4, 6] {
+            for j in (0..10).filter(|i| ![2, 3, 4, 6].contains(&i)) {
+                if i != j {
+                    assert!(!ds.are_connected(i, j), "{} <-> {}", i, j);
+                }
+            }
         }
     }
 }
