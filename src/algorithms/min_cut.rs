@@ -137,18 +137,36 @@ mod test {
     use rand::thread_rng;
     #[test]
     fn karger_stein() {
-        assert_eq!(
-            super::karger_stein(&mut test_graphs::graph_one::<EdgeList>()).len(),
-            3
-        )
+        let cut = super::karger_stein(&mut test_graphs::graph_one::<EdgeList>())
+            .into_iter()
+            .map(|e| (e.0, e.1))
+            .collect::<Vec<_>>();
+        assert!(
+            test_graphs::GRAPH_ONE_MIN_CUT
+                .iter()
+                .all(|e| cut.iter().any(|e1| e == e1))
+                && test_graphs::GRAPH_ONE_MIN_CUT.len() == cut.len(),
+            "Different min cut. Expected: {:?} Got: {:?}",
+            test_graphs::GRAPH_ONE_MIN_CUT,
+            cut
+        );
     }
 
     #[test]
     fn fast_karger_stein() {
-        assert_eq!(
-            super::fast_karger_stein(&mut test_graphs::graph_one::<EdgeList>()).len(),
-            3
-        )
+        let cut = super::fast_karger_stein(&mut test_graphs::graph_one::<EdgeList>())
+            .into_iter()
+            .map(|e| (e.0, e.1))
+            .collect::<Vec<_>>();
+        assert!(
+            test_graphs::GRAPH_ONE_MIN_CUT
+                .iter()
+                .all(|e| cut.iter().any(|e1| e == e1))
+                && test_graphs::GRAPH_ONE_MIN_CUT.len() == cut.len(),
+            "Different min cut. Expected: {:?} Got: {:?}",
+            test_graphs::GRAPH_ONE_MIN_CUT,
+            cut
+        );
     }
 
     #[test]

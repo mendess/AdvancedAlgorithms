@@ -13,18 +13,3 @@ pub fn main() {
     );
     println!("{:?}", g);
 }
-
-#[cfg(test)]
-mod test {
-    use crate::graph;
-    use crate::graphs::{matrix::Adjacency, Graph};
-    #[test]
-    fn test_macro1() {
-        let graph = graph![Adjacency = (3) {
-            0 => 1;
-            0 => 2;
-            1 => 0;
-        }];
-        assert_eq!(graph.edges(), 3);
-    }
-}

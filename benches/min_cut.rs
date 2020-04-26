@@ -21,7 +21,7 @@ pub fn random_graph_er_bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("MinCut");
     let params = [1_usize, 5, 9]
         .iter()
-        .map(|i| i * 100)
+        .map(|i| i * 10)
         .flat_map(|n| [0.4, 0.5, 0.7].iter().map(move |&p| (n, p)))
         .map(|(n, p)| {
             let dist = Binomial::new((n * (n - 1) / 2).try_into().unwrap(), p).unwrap();
