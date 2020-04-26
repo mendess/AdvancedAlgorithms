@@ -61,10 +61,7 @@ pub fn make_graphs(c: &mut Criterion) {
         group.bench_function(BenchmarkId::new("csr", format!("{}_{}_{}", n, p, e)), |b| {
             b.iter_batched(
                 || gen_edges(n, p),
-                |(nn, mut edges)| {
-                    edges.sort_unstable();
-                    CSR::from_edges(nn, edges)
-                },
+                |(nn, mut edges)| CSR::from_edges(nn, edges),
                 BatchSize::SmallInput,
             )
         });
