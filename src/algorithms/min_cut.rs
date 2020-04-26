@@ -109,7 +109,7 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::graphs::{edge_list::EdgeList, test_graphs};
+    use crate::graphs::{edge_list::EdgeList, test_graphs, FromEdges};
     use rand::thread_rng;
     #[test]
     fn karger_stein() {
@@ -129,10 +129,9 @@ mod test {
 
     #[test]
     fn karget_stein_random() {
-        super::fast_karger_stein(&mut test_graphs::random_graph_er::<EdgeList, _>(
+        super::fast_karger_stein(&mut EdgeList::from_edges(
             10,
-            0.2,
-            thread_rng(),
+            test_graphs::random_graph_er(10, 0.2, thread_rng()),
         ));
     }
 }

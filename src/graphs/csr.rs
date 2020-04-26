@@ -38,12 +38,14 @@ impl Graph for CSR {
     }
 }
 
-impl FromEdges for CSR {
+impl FromEdges<(), ()> for CSR {
     /// Create a new CSR
-    fn from_edges<I>(n: usize, edges: I) -> Self
+    fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
-        I: ExactSizeIterator<Item = Edge>,
+        I: IntoIterator<IntoIter = Iter, Item = Edge>,
+        Iter: ExactSizeIterator<Item = Edge>,
     {
+        let edges = list.into_iter();
         let mut s = Self {
             columns: Vec::with_capacity(edges.len()),
             row_indexes: vec![0; n + 1].into_boxed_slice(),

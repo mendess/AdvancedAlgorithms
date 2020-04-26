@@ -1,4 +1,4 @@
-use crate::graphs::{Edge, EdgeListGraph, FromEdges, Graph, GraphWeighted, WEdge};
+use crate::graphs::{EdgeListGraph, FromEdges, Graph, GraphWeighted, WEdge};
 
 pub struct EdgeList<N = (), E = ()> {
     edges: Vec<WEdge<N, E>>,
@@ -20,14 +20,15 @@ impl<N, E> GraphWeighted for EdgeList<N, E> {
     type EdgeWeight = E;
 }
 
-impl FromEdges for EdgeList<(), ()> {
-    fn from_edges<I>(n: usize, edges: I) -> Self
+impl<N, E> FromEdges<N, E> for EdgeList<N, E> {
+    fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
-        I: ExactSizeIterator<Item = Edge>,
+        I: IntoIterator<IntoIter = Iter, Item = WEdge<N, E>>,
+        Iter: ExactSizeIterator<Item = WEdge<N, E>>,
     {
         Self {
             n_vertices: n,
-            edges: edges.map(|e| (e.0, e.1, (), ())).collect(),
+            edges: list.into_iter().collect(),
         }
     }
 }

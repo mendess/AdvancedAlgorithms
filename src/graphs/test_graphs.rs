@@ -1,4 +1,4 @@
-use super::FromEdges;
+use super::{Edge, FromEdges};
 use crate::graph;
 use rand::{
     distributions::{Distribution, Uniform},
@@ -8,7 +8,7 @@ use rand_distr::Binomial;
 use rustc_hash::FxHashSet as HashSet;
 use std::convert::TryInto;
 
-pub fn graph_one<G: FromEdges>() -> G {
+pub fn graph_one<G: FromEdges<(), ()>>() -> G {
     graph!(G = (10) {
        0 => 1;
        0 => 2;
@@ -58,9 +58,8 @@ pub fn graph_one<G: FromEdges>() -> G {
     })
 }
 
-pub fn random_graph<G, R>(n: usize, m: usize, mut rng: R) -> G
+pub fn random_graph<R>(n: usize, m: usize, mut rng: R) -> Vec<Edge>
 where
-    G: FromEdges,
     R: Rng,
 {
     let dist = Uniform::from(0..n);
@@ -74,7 +73,7 @@ where
         }
     }
     edges.sort_unstable();
-    G::from_edges(n, edges.into_iter())
+    edges
 }
 
 /// Generates a graph using the Evdos Ronmi method.
@@ -88,10 +87,9 @@ where
 ///
 /// G(N,M) <=> G(N,P)
 /// ```
-pub fn random_graph_er<G, R>(n: usize, p: f64, mut rng: R) -> G
+pub fn random_graph_er<R>(n: usize, p: f64, mut rng: R) -> Vec<Edge>
 where
     R: Rng,
-    G: FromEdges,
 {
     let dist = Binomial::new((n * (n - 1) / 2).try_into().unwrap(), p).unwrap();
     random_graph(n, (dist.sample(&mut rng)).try_into().unwrap(), rng)

@@ -25,11 +25,13 @@ impl Graph for Adjacency {
     }
 }
 
-impl FromEdges for Adjacency {
-    fn from_edges<I>(n: usize, edges: I) -> Self
+impl FromEdges<(), ()> for Adjacency {
+    fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
-        I: ExactSizeIterator<Item = Edge>,
+        I: IntoIterator<IntoIter = Iter, Item = Edge>,
+        Iter: ExactSizeIterator<Item = Edge>,
     {
+        let edges = list.into_iter();
         let mut s = Self {
             matrix: Default::default(),
             n_edges: edges.len(),
