@@ -45,14 +45,12 @@ impl FromEdges<(), ()> for CSR {
         I: IntoIterator<IntoIter = Iter, Item = Edge>,
         Iter: ExactSizeIterator<Item = Edge>,
     {
-        let edges = list.into_iter();
+        let mut edges = list.into_iter();
         let mut s = Self {
             columns: Vec::with_capacity(edges.len()),
             row_indexes: vec![0; n + 1].into_boxed_slice(),
         };
-        edges.for_each(|(from, to, (), ())| {
-            s.add_link(from, to);
-        });
+        assert!(edges.all(|(from, to, (), ())| { s.add_link(from, to) }));
         s
     }
 }
@@ -65,9 +63,6 @@ impl CSR {
     }
 
     /// Add a link to the CSR
-    ///
-    /// # Panics
-    /// If a link is added beyond the value passed to the constructor
     fn add_link(&mut self, from: usize, to: usize) -> bool {
         if from > self.row_indexes.len() {
             return false;
