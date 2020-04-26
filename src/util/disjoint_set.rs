@@ -25,14 +25,10 @@ impl DisjointSet for SimpleDisjointSet {
         }
     }
 
-    fn find(&mut self, mut id: usize) -> usize {
-        while self.ids[id] != id {
-            id = self.ids[id]
+    fn find(&mut self, id: usize) -> usize {
+        if self.ids[id] != id {
+            self.ids[id] = self.find(self.ids[id])
         }
-
-        // if self.ids[id] != id {
-        //     self.ids[id] = self.find(self.ids[id])
-        // }
         self.ids[id]
     }
 
@@ -138,11 +134,11 @@ impl DisjointSet for UndoDisjointSet {
 
     fn find(&mut self, id: usize) -> usize {
         if self.nodes[id].id != id {
-            self.history.push(Change::new(id, self.nodes[id]));
+            // self.history.push(Change::new(id, self.nodes[id]));
             let new_id = self.find(self.nodes[id].id);
-            if new_id == self.nodes[id].id {
-                self.history.pop();
-            }
+            // if new_id == self.nodes[id].id {
+            //     self.history.pop();
+            // }
             self.nodes[id].id = new_id;
         }
         self.nodes[id].id
