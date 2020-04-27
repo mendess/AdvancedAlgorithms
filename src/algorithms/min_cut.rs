@@ -197,14 +197,9 @@ pub mod count {
             contract_count(edges, &mut ds1, t, &mut updateable_node);
             let m1 = min_cut_count(edges, ds1, updateable_node);
             updateable_node = current_node;
-            let mut ds2 = ds.clone();
-            contract_count(edges, &mut ds2, t, &mut updateable_node);
-            let m2 = min_cut_count(edges, ds2, updateable_node);
-            if m1 < m2 {
-                m1
-            } else {
-                m2
-            }
+            contract_count(edges, &mut ds, t, &mut updateable_node);
+            let m2 = min_cut_count(edges, ds, updateable_node);
+            m1.min(m2)
         }
     }
 
@@ -273,12 +268,14 @@ pub mod count {
 mod test {
     use crate::graphs::{edge_list::EdgeList, test_graphs, FromEdges};
 
+    const SUCCSESS_RATE: usize = 7;
+
     #[test]
     fn karger_stein() {
         let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
             super::karger_stein(&mut test_graphs::graph_one::<EdgeList>())
         });
-        assert!(succ >= 8, "Got it right {} times", succ)
+        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
     }
 
     #[test]
@@ -286,7 +283,7 @@ mod test {
         let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
             super::fast_karger_stein(&mut test_graphs::graph_one::<EdgeList>())
         });
-        assert!(succ >= 8, "Got it right {} times", succ)
+        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
     }
 
     #[test]
@@ -299,7 +296,10 @@ mod test {
                 }
             }
         }
-        let g0 = g.iter().map(|(a, b, _, _)| (a + 10, b + 10, (), ())).collect::<Vec<_>>();
+        let g0 = g
+            .iter()
+            .map(|(a, b, _, _)| (a + 10, b + 10, (), ()))
+            .collect::<Vec<_>>();
         g.extend(g0);
         let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
         for (a, b) in &min_cut {
@@ -308,7 +308,7 @@ mod test {
         let succ = check_min_cut(&min_cut, || {
             super::fast_karger_stein(&mut EdgeList::from_edges(20, g.clone()))
         });
-        assert!(succ >= 8, "Got it right {} times", succ)
+        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
     }
 
     #[cfg(test)]
@@ -329,5 +329,61 @@ mod test {
                 cut == attempt
             })
             .count()
+    }
+
+    #[cfg(test)]
+    mod count {
+        use super::super::count::*;
+        use super::SUCCSESS_RATE;
+        use crate::graphs::{edge_list::EdgeList, FromEdges, test_graphs};
+
+        #[test]
+        fn karger_stein() {
+            let succ = check_min_cut(test_graphs::GRAPH_ONE_MIN_CUT.len(), || {
+                karger_stein_count(&mut test_graphs::graph_one::<EdgeList>())
+            });
+            assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+        }
+
+        #[test]
+        fn fast_karger_stein() {
+            let succ = check_min_cut(test_graphs::GRAPH_ONE_MIN_CUT.len(), || {
+                fast_karger_stein_count(&mut test_graphs::graph_one::<EdgeList>())
+            });
+            assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+        }
+
+        #[test]
+        fn karger_stein_random() {
+            let mut g = Vec::new();
+            for i in 0..10 {
+                for j in 0..10 {
+                    if i != j {
+                        g.push((i, j, (), ()));
+                    }
+                }
+            }
+            let g0 = g
+                .iter()
+                .map(|(a, b, _, _)| (a + 10, b + 10, (), ()))
+                .collect::<Vec<_>>();
+            g.extend(g0);
+            let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
+            for (a, b) in &min_cut {
+                g.push((*a, *b, (), ()))
+            }
+            let succ = check_min_cut(min_cut.len(), || {
+                fast_karger_stein_count(&mut EdgeList::from_edges(20, g.clone()))
+            });
+            assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+        }
+
+        #[cfg(test)]
+        fn check_min_cut<F>(cut: usize, attempts: F) -> usize
+        where
+            F: Fn() -> usize,
+        {
+            (0..10).filter(|_| cut == attempts()).count()
+        }
     }
 }

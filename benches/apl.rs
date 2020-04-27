@@ -1,5 +1,5 @@
 use aava::{
-    algorithms::min_cut,
+    algorithms::apl,
     graphs::{edge_list::EdgeList, test_graphs::random_graph_er, FromEdges},
 };
 use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion, Throughput};
@@ -16,7 +16,7 @@ fn gen_graph(n: usize, p: f64) -> EdgeList {
 }
 
 pub fn bench(c: &mut Criterion) {
-    let mut group = c.benchmark_group("MinCut");
+    let mut group = c.benchmark_group("APL");
     let params = [1_usize, 5, 9]
         .iter()
         .map(|i| i * 10)
@@ -32,41 +32,11 @@ pub fn bench(c: &mut Criterion) {
     for (n, p, e) in params {
         group.throughput(Throughput::Elements(e as u64));
         group.bench_function(
-            BenchmarkId::new("karger_stein", format!("{}_{}_{}", n, p, e)),
+            BenchmarkId::new("apl", format!("{}_{}_{}", n, p, e)),
             |b| {
                 b.iter_batched(
                     || gen_graph(n, p),
-                    |mut graph| min_cut::karger_stein(&mut graph),
-                    BatchSize::SmallInput,
-                )
-            },
-        );
-        group.bench_function(
-            BenchmarkId::new("fast_karger_stein", format!("{}_{}_{}", n, p, e)),
-            |b| {
-                b.iter_batched(
-                    || gen_graph(n, p),
-                    |mut graph| min_cut::fast_karger_stein(&mut graph),
-                    BatchSize::SmallInput,
-                )
-            },
-        );
-        group.bench_function(
-            BenchmarkId::new("karger_stein_count", format!("{}_{}_{}", n, p, e)),
-            |b| {
-                b.iter_batched(
-                    || gen_graph(n, p),
-                    |mut graph| min_cut::count::karger_stein_count(&mut graph),
-                    BatchSize::SmallInput,
-                )
-            },
-        );
-        group.bench_function(
-            BenchmarkId::new("fast_karger_stein_count", format!("{}_{}_{}", n, p, e)),
-            |b| {
-                b.iter_batched(
-                    || gen_graph(n, p),
-                    |mut graph| min_cut::count::fast_karger_stein_count(&mut graph),
+                    |mut graph| apl::apl(&mut graph),
                     BatchSize::SmallInput,
                 )
             },
