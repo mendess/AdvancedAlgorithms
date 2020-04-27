@@ -2,9 +2,7 @@ use aava::{
     algorithms::min_cut,
     graphs::{edge_list::EdgeList, test_graphs::random_graph_er, FromEdges},
 };
-use criterion::{
-    black_box, criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion, Throughput,
-};
+use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion, Throughput};
 use rand::{distributions::Distribution, rngs::SmallRng, SeedableRng};
 use rand_distr::Binomial;
 use std::convert::TryInto;
@@ -14,7 +12,7 @@ fn make_rng() -> SmallRng {
 }
 
 fn gen_graph(n: usize, p: f64) -> EdgeList {
-    EdgeList::from_edges(n, random_graph_er(n, p, black_box(make_rng())))
+    EdgeList::from_edges(n, random_graph_er(n, p, make_rng()))
 }
 
 pub fn bench(c: &mut Criterion) {
@@ -23,6 +21,7 @@ pub fn bench(c: &mut Criterion) {
         .iter()
         .map(|i| i * 10)
         .flat_map(|n| [0.4, 0.5, 0.7].iter().map(move |&p| (n, p)))
+        .chain(std::iter::once((500, 0.5)))
         .map(|(n, p)| {
             let dist = Binomial::new((n * (n - 1) / 2).try_into().unwrap(), p).unwrap();
             let e = dist.sample(&mut make_rng());
@@ -78,7 +77,7 @@ pub fn bench(c: &mut Criterion) {
 
 criterion_group! {
     name = benches;
-    config = Criterion::default().sample_size(10);
+    config = Criterion::default().sample_size(50);
     targets = bench
 }
 criterion_main!(benches);
