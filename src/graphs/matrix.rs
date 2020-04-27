@@ -92,8 +92,6 @@ impl Adjacency {
     }
 }
 
-impl Adjacency {}
-
 impl Index<usize> for Adjacency {
     type Output = Neighbours<usize>;
     fn index(&self, u: usize) -> &Self::Output {
