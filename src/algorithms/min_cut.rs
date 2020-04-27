@@ -2,6 +2,7 @@ use crate::{
     graphs::{EdgeListGraph, WEdge},
     util::disjoint_set::*,
 };
+use itertools::Itertools;
 use rand::{
     distributions::uniform::{UniformInt, UniformSampler},
     thread_rng,
@@ -16,7 +17,7 @@ fn contract<N, E, D>(
 where
     N: Clone,
     E: Clone,
-    D: DisjointSet,
+    D: DisjointSet + std::fmt::Debug,
 {
     let mut rng = thread_rng();
     let mut cur = *cur_node;
@@ -29,6 +30,13 @@ where
         cur += 1;
     }
     *cur_node = cur;
+    debug_assert_eq!(
+        ds.components(),
+        comp,
+        "Couldn't contract: {:?}\nGraph: {:?}",
+        ds,
+        edges.iter().map(|e| (e.0, e.1)).format(",")
+    );
     if comp == 2 {
         edges
             .iter()
@@ -40,26 +48,27 @@ where
     }
 }
 
-fn min_cut<N, E, D>(edges: &mut [WEdge<N, E>], mut ds: D, current_node: usize) -> Vec<WEdge<N, E>>
+fn min_cut<N, E, D>(
+    edges: &mut [WEdge<N, E>],
+    mut ds: D,
+    mut current_node: usize,
+) -> Vec<WEdge<N, E>>
 where
     N: Clone,
     E: Clone,
-    D: DisjointSet + Clone,
+    D: DisjointSet + Clone + std::fmt::Debug,
 {
     if ds.components() < 6 {
-        let mut cur = current_node;
-        contract(edges, &mut ds, 2, &mut cur)
+        contract(edges, &mut ds, 2, &mut current_node)
     } else {
         let t = 1 + (ds.components() as f64 / 2.0_f64.sqrt()) as usize;
-        let mut updateable_node = current_node;
+        let mut current_node_copy = current_node;
         let mut ds1 = ds.clone();
-        contract(edges, &mut ds1, t, &mut updateable_node);
-        let m1 = min_cut(edges, ds1, updateable_node);
+        contract(edges, &mut ds1, t, &mut current_node_copy);
+        let m1 = min_cut(edges, ds1, current_node_copy);
 
-        updateable_node = current_node;
-        let mut ds2 = ds;
-        contract(edges, &mut ds2, t, &mut updateable_node);
-        let m2 = min_cut(edges, ds2, updateable_node);
+        contract(edges, &mut ds, t, &mut current_node);
+        let m2 = min_cut(edges, ds, current_node);
         if m1.len() < m2.len() {
             m1
         } else {
@@ -263,46 +272,62 @@ pub mod count {
 #[cfg(test)]
 mod test {
     use crate::graphs::{edge_list::EdgeList, test_graphs, FromEdges};
-    use rand::thread_rng;
+
     #[test]
     fn karger_stein() {
-        let cut = super::karger_stein(&mut test_graphs::graph_one::<EdgeList>())
-            .into_iter()
-            .map(|e| (e.0, e.1))
-            .collect::<Vec<_>>();
-        assert!(
-            test_graphs::GRAPH_ONE_MIN_CUT
-                .iter()
-                .all(|e| cut.iter().any(|e1| e == e1))
-                && test_graphs::GRAPH_ONE_MIN_CUT.len() == cut.len(),
-            "Different min cut. Expected: {:?} Got: {:?}",
-            test_graphs::GRAPH_ONE_MIN_CUT,
-            cut
-        );
+        let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
+            super::karger_stein(&mut test_graphs::graph_one::<EdgeList>())
+        });
+        assert!(succ >= 8, "Got it right {} times", succ)
     }
 
     #[test]
     fn fast_karger_stein() {
-        let cut = super::fast_karger_stein(&mut test_graphs::graph_one::<EdgeList>())
-            .into_iter()
-            .map(|e| (e.0, e.1))
-            .collect::<Vec<_>>();
-        assert!(
-            test_graphs::GRAPH_ONE_MIN_CUT
-                .iter()
-                .all(|e| cut.iter().any(|e1| e == e1))
-                && test_graphs::GRAPH_ONE_MIN_CUT.len() == cut.len(),
-            "Different min cut. Expected: {:?} Got: {:?}",
-            test_graphs::GRAPH_ONE_MIN_CUT,
-            cut
-        );
+        let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
+            super::fast_karger_stein(&mut test_graphs::graph_one::<EdgeList>())
+        });
+        assert!(succ >= 8, "Got it right {} times", succ)
     }
 
     #[test]
-    fn karget_stein_random() {
-        super::fast_karger_stein(&mut EdgeList::from_edges(
-            10,
-            test_graphs::random_graph_er(10, 0.2, thread_rng()),
-        ));
+    fn karger_stein_random() {
+        let mut g = Vec::new();
+        for i in 0..10 {
+            for j in 0..10 {
+                if i != j {
+                    g.push((i, j, (), ()));
+                }
+            }
+        }
+        let g0 = g.iter().map(|(a, b, _, _)| (a + 10, b + 10, (), ())).collect::<Vec<_>>();
+        g.extend(g0);
+        let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
+        for (a, b) in &min_cut {
+            g.push((*a, *b, (), ()))
+        }
+        let succ = check_min_cut(&min_cut, || {
+            super::fast_karger_stein(&mut EdgeList::from_edges(20, g.clone()))
+        });
+        assert!(succ >= 8, "Got it right {} times", succ)
+    }
+
+    #[cfg(test)]
+    fn check_min_cut<F, N, E>(cut: &[(usize, usize)], attempts: F) -> usize
+    where
+        F: Fn() -> Vec<(usize, usize, N, E)>,
+    {
+        let mut cut: Vec<_> = cut.to_owned();
+        cut.sort();
+        (0..10)
+            .map(|_| attempts())
+            .filter(|attempt| {
+                let mut attempt = attempt
+                    .iter()
+                    .map(|(a, b, _, _)| (*a, *b))
+                    .collect::<Vec<_>>();
+                attempt.sort();
+                cut == attempt
+            })
+            .count()
     }
 }

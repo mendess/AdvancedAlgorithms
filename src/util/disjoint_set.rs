@@ -32,14 +32,14 @@ impl DisjointSet for SimpleDisjointSet {
         self.ids[id]
     }
 
-    fn union(&mut self, mut i: usize, mut j: usize) {
-        i = self.find(i);
-        j = self.find(j);
-        if self.ranks[i] < self.ranks[j] {
-            std::mem::swap(&mut i, &mut j)
+    fn union(&mut self, i: usize, j: usize) {
+        let mut parent = self.find(i);
+        let mut child = self.find(j);
+        if self.ranks[parent] < self.ranks[child] {
+            std::mem::swap(&mut parent, &mut child)
         }
-        self.ids[j] = i;
-        self.ranks[i] += 1;
+        self.ids[child] = parent;
+        self.ranks[parent] += 1;
         self.components -= 1;
     }
 
@@ -107,7 +107,7 @@ impl History {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq)]
 pub struct UndoDisjointSet {
     components: usize,
     num_sets: usize,
@@ -134,12 +134,7 @@ impl DisjointSet for UndoDisjointSet {
 
     fn find(&mut self, id: usize) -> usize {
         if self.nodes[id].id != id {
-            // self.history.push(Change::new(id, self.nodes[id]));
-            let new_id = self.find(self.nodes[id].id);
-            // if new_id == self.nodes[id].id {
-            //     self.history.pop();
-            // }
-            self.nodes[id].id = new_id;
+            self.nodes[id].id = self.find(self.nodes[id].id);
         }
         self.nodes[id].id
     }
@@ -177,6 +172,26 @@ impl UndoDisjointSet {
             self.nodes[c.id] = c.old_state;
             self.components += usize::from(c.components_changed);
         }
+    }
+}
+
+use std::fmt::{self, Debug};
+
+impl Debug for UndoDisjointSet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f)?;
+        for i in 0..self.nodes.len() {
+            write!(f, "{:2},", i)?;
+        }
+        writeln!(f)?;
+        for i in self.nodes.iter() {
+            write!(f, "{:2},", i.id)?;
+        }
+        writeln!(f)?;
+        for i in self.nodes.iter() {
+            write!(f, "{:2},", i.rank)?;
+        }
+        Ok(())
     }
 }
 

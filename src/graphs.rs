@@ -33,6 +33,22 @@ pub struct ExactSizeIter<I> {
     pub size: usize,
 }
 
+impl<'g, G> Graph for &'g G
+where
+    G: Graph,
+{
+    type NodeWeight = G::NodeWeight;
+    type EdgeWeight = G::EdgeWeight;
+
+    fn vertices(&self) -> usize {
+        (*self).vertices()
+    }
+
+    fn edges(&self) -> usize {
+        (*self).edges()
+    }
+}
+
 impl<I: Iterator> Iterator for ExactSizeIter<I> {
     type Item = I::Item;
     #[inline]
