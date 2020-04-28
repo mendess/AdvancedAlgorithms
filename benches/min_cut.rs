@@ -21,7 +21,7 @@ pub fn bench(c: &mut Criterion) {
         .iter()
         .map(|i| i * 10)
         .flat_map(|n| [0.4, 0.5, 0.7].iter().map(move |&p| (n, p)))
-        .chain(std::iter::once((500, 0.5)))
+        .chain(std::iter::once((100, 0.5)))
         .map(|(n, p)| {
             let dist = Binomial::new((n * (n - 1) / 2).try_into().unwrap(), p).unwrap();
             let e = dist.sample(&mut make_rng());
