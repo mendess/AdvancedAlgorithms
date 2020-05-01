@@ -2,6 +2,7 @@
 pub mod algorithms;
 pub mod graphs;
 pub mod util;
+pub mod hyper_ball;
 use graphs::{csr::CSR, FromEdges, ToExactSizeIter};
 
 pub fn main() {
