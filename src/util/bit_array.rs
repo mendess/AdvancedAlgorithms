@@ -118,9 +118,8 @@ impl<'a> Iterator for Iter<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         let split = self.mask.count_ones() != self.register_size as u32;
         let r = match self.slice {
-            [] => None,
-            s if split => {
-                let fst_snd = u16::from_be_bytes(s[0..2].try_into().expect("Truncated value"));
+            [_, ..] if split => {
+                let fst_snd = u16::from_be_bytes(self.slice[0..2].try_into().expect("Truncated value"));
                 let n_past_boundary = self.register_size as u32 - ((!self.mask).trailing_zeros());
                 let off_from_base = WORD_SIZE as u32
                     - (self.register_size as u32 - ((!self.mask).trailing_zeros()));
@@ -130,8 +129,8 @@ impl<'a> Iterator for Iter<'a> {
                 self.slice = &self.slice[1..];
                 Some(r as u8)
             }
-            s => {
-                let r = (s[0] & self.mask) >> self.mask.trailing_zeros();
+            [fst, ..] => {
+                let r = (fst & self.mask) >> self.mask.trailing_zeros();
                 self.mask >>= self.register_size;
                 if self.mask == 0 {
                     self.mask = init_left_mask(self.register_size as usize);
@@ -139,6 +138,7 @@ impl<'a> Iterator for Iter<'a> {
                 }
                 Some(r)
             }
+            [] => None,
         };
         self.count = match self.count.checked_sub(1) {
             Some(0) | None => {
