@@ -5,29 +5,29 @@ use std::{
     ops::RangeInclusive,
 };
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(u8)]
 pub enum B {
-    M16 = 4,
-    M32 = 5,
-    M64 = 6,
-    M128 = 7,
-    M256 = 8,
-    M512 = 9,
-    M1024 = 10,
-    M2048 = 11,
-    M4096 = 12,
-    M8192 = 13,
-    M16384 = 14,
-    M32768 = 15,
+    B4 = 4,
+    B5 = 5,
+    B6 = 6,
+    B7 = 7,
+    B8 = 8,
+    B9 = 9,
+    B10 = 10,
+    B11 = 11,
+    B12 = 12,
+    B13 = 13,
+    B14 = 14,
+    B15 = 15,
 }
 
 impl B {
     fn alpha(self) -> f64 {
         match self {
-            B::M16 => 0.673,
-            B::M32 => 0.697,
-            B::M64 => 0.709,
+            B::B4 => 0.673,
+            B::B5 => 0.697,
+            B::B6 => 0.709,
             _ => 0.7213 / (1.0 + 1.079 / self.m() as f64),
         }
     }
@@ -43,6 +43,7 @@ const TWO_POW_32: f64 = (1u64 << 32) as f64; //4294967296.0;
 /// - Word size [16, 32, 64]
 /// - b
 /// - m = 2^b
+#[derive(Clone, Debug)]
 pub struct HyperLogLog<T, H = BuildHasherDefault<FxHasher>> {
     registers: Box<[u8]>,
     m_minus_1: u64,
@@ -114,6 +115,18 @@ impl<T, H> HyperLogLog<T, H> {
             -1.04 / f64::sqrt(self.registers.len() as f64),
             1.04 / f64::sqrt(self.registers.len() as f64),
         )
+    }
+
+    pub fn union_onto(&self, other: &mut Self) -> bool {
+        other
+            .registers
+            .iter_mut()
+            .zip(self.registers.iter())
+            .any(|(a, b)| {
+                let old_a = *a;
+                *a = u8::max(*a, *b);
+                old_a != *a
+            })
     }
 }
 
@@ -210,9 +223,9 @@ mod tests {
             paste::item! {
             $(
             #[test]
-            fn [<test_100k_m $b>]() {
+            fn [<test_100k_b $b>]() {
                 const N: usize = 100 * 1000;
-                let diffs = run(N, B::[<M $b>]);
+                let diffs = run(N, B::[<B $b>]);
                 let avg = print_diffs(N, &diffs);
                 assert!(avg >= (N - N / 16) as f64 && avg <= (N + N / 16) as f64);
             }
@@ -221,8 +234,8 @@ mod tests {
         };
     }
 
-    // make_test!(16, 32, 64, 128, 256);
-    make_test!(512, 1024, 2048, 4096, 8192, 16384, 32768);
+    // make_test!(4, 5, 6, 7, 8);
+    make_test!(9, 10, 11, 12, 13, 14, 15);
 
     #[cfg(test)]
     fn print_diffs(n: usize, d: &[f64]) -> f64 {

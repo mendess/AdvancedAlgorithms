@@ -36,3 +36,8 @@ harness = false
 [[bench]]
 name = "apl"
 harness = false
+
+[[bench]]
+name = "bit_array"
+harness = false
+

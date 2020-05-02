@@ -80,11 +80,15 @@ impl CSR {
     }
 
     /// Iterate over the neighbours of each edge.
-    fn neighbourhoods(&self) -> impl Iterator<Item = &[usize]> {
+    pub fn neighbourhoods(&self) -> impl Iterator<Item = &[usize]> {
         self.row_indexes
             .iter()
             .tuple_windows()
             .map(move |(&s, &e)| &self.columns[s..e])
+    }
+
+    pub fn nodes(&self) -> impl Iterator<Item = usize> {
+        0..self.vertices()
     }
 }
 

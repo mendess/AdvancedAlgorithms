@@ -1,9 +1,10 @@
 #![warn(rust_2018_idioms)]
 pub mod algorithms;
 pub mod graphs;
-pub mod util;
 pub mod hyper_ball;
-use graphs::{csr::CSR, FromEdges, ToExactSizeIter};
+pub mod util;
+use graphs::{csr::CSR, FromEdges};
+use util::ToExactSizeIter;
 
 pub fn main() {
     let g = CSR::from_edges(
