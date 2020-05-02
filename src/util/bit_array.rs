@@ -119,8 +119,7 @@ impl<'a> Iterator for Iter<'a> {
             [fst, snd, ..] if self.mask.count_ones() != self.register_size as u32 => {
                 let fst_snd = u16::from_be_bytes([*fst, *snd]);
                 let n_past_boundary = self.register_size as u32 - ((!self.mask).trailing_zeros());
-                let off_from_base = WORD_SIZE as u32
-                    - (self.register_size as u32 - ((!self.mask).trailing_zeros()));
+                let off_from_base = WORD_SIZE as u32 - n_past_boundary;
                 self.mask = init_left_mask(self.register_size as usize);
                 let r = (fst_snd >> off_from_base) & ((1u16 << self.register_size) - 1);
                 self.mask >>= n_past_boundary;
