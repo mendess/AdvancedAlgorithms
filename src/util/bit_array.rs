@@ -111,9 +111,6 @@ pub struct Iter<'a> {
     count: usize,
 }
 
-// reg_size = 5
-// 0b00011111
-// (1 << 5) - 1
 impl<'a> Iterator for Iter<'a> {
     type Item = u8;
     fn next(&mut self) -> Option<Self::Item> {
@@ -156,6 +153,7 @@ pub struct Iter2<'a> {
 
 impl Iterator for Iter2<'_> {
     type Item = u8;
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         if self.index == self.cap {
             None
