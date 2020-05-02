@@ -2,7 +2,6 @@ mod format_bit_slice;
 
 use format_bit_slice::format_slice;
 use std::{
-    convert::TryInto,
     fmt::{self, Debug},
     mem::size_of,
 };
@@ -116,10 +115,9 @@ impl<'a> Iterator for Iter<'a> {
     type Item = u8;
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
-        let split = self.mask.count_ones() != self.register_size as u32;
         let r = match self.slice {
-            [_, ..] if split => {
-                let fst_snd = u16::from_be_bytes(self.slice[0..2].try_into().expect("Truncated value"));
+            [fst, snd, ..] if self.mask.count_ones() != self.register_size as u32 => {
+                let fst_snd = u16::from_be_bytes([*fst, *snd]);
                 let n_past_boundary = self.register_size as u32 - ((!self.mask).trailing_zeros());
                 let off_from_base = WORD_SIZE as u32
                     - (self.register_size as u32 - ((!self.mask).trailing_zeros()));
