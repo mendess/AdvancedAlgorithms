@@ -82,6 +82,14 @@ impl BitArray {
             count: self.capacity,
         }
     }
+
+    pub fn iter2(&self) -> Iter2<'_> {
+        Iter2 {
+            slice: self,
+            index: 0,
+            cap: self.capacity,
+        }
+    }
 }
 
 const fn init_left_mask(r_size: usize) -> u8 {
@@ -133,6 +141,25 @@ impl<'a> Iterator for Iter<'a> {
             }
             r
         })
+    }
+}
+
+pub struct Iter2<'a> {
+    slice: &'a BitArray,
+    index: usize,
+    cap: usize,
+}
+
+impl Iterator for Iter2<'_> {
+    type Item = u8;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index == self.cap {
+            None
+        } else {
+            let e = self.slice.get(self.index);
+            self.index += 1;
+            Some(e)
+        }
     }
 }
 

@@ -4,7 +4,6 @@ use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criteri
 const ELEMS: usize = 1434;
 pub fn iteration(c: &mut Criterion) {
     let mut group = c.benchmark_group("BitArray");
-    group.throughput(Throughput::Elements(ELEMS as u64));
     for (r_size, v) in (1..8).map(|w| {
         (w, {
             let num_max = 1 << w;
@@ -15,12 +14,24 @@ pub fn iteration(c: &mut Criterion) {
             v
         })
     }) {
+        group.throughput(Throughput::Bytes(r_size as u64));
         group.bench_with_input(
             BenchmarkId::new("iterator", format!("register_size_{}", r_size)),
             &v,
             |b, v| {
                 b.iter(|| {
                     v.iter().for_each(|i| {
+                        black_box(i);
+                    })
+                })
+            },
+        );
+        group.bench_with_input(
+            BenchmarkId::new("iterator2", format!("register_size_{}", r_size)),
+            &v,
+            |b, v| {
+                b.iter(|| {
+                    v.iter2().for_each(|i| {
                         black_box(i);
                     })
                 })
