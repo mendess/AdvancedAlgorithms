@@ -91,7 +91,7 @@ impl BitArray {
         }
     }
 
-    pub fn iter3(&self) -> impl Iterator<Item=u8> + '_ {
+    pub fn iter3(&self) -> impl Iterator<Item = u8> + '_ {
         (0..self.capacity).map(move |i| self.get(i))
     }
 }
@@ -113,6 +113,7 @@ pub struct Iter<'a> {
 
 impl<'a> Iterator for Iter<'a> {
     type Item = u8;
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         self.slice.first().copied().map(|fst| {
             let r = if self.mask.count_ones() != self.register_size as u32 {
@@ -136,9 +137,12 @@ impl<'a> Iterator for Iter<'a> {
                 }
                 r
             };
-            self.count -= 1;
-            if self.count == 0 {
-                self.slice = &[];
+            match self.count.checked_sub(1) {
+                Some(0) | None => {
+                    self.count = 0;
+                    self.slice = &[];
+                }
+                Some(c) => self.count = c,
             }
             r
         })
