@@ -90,6 +90,10 @@ impl BitArray {
             cap: self.capacity,
         }
     }
+
+    pub fn iter3(&self) -> impl Iterator<Item=u8> + '_ {
+        (0..self.capacity).map(move |i| self.get(i))
+    }
 }
 
 const fn init_left_mask(r_size: usize) -> u8 {

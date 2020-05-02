@@ -38,6 +38,17 @@ pub fn iteration(c: &mut Criterion) {
             },
         );
         group.bench_with_input(
+            BenchmarkId::new("iterator3", format!("register_size_{}", r_size)),
+            &v,
+            |b, v| {
+                b.iter(|| {
+                    v.iter3().for_each(|i| {
+                        black_box(i);
+                    })
+                })
+            },
+        );
+        group.bench_with_input(
             BenchmarkId::new("loop", format!("register_size_{}", r_size)),
             &v,
             |b, v| {
@@ -54,7 +65,7 @@ pub fn iteration(c: &mut Criterion) {
 
 criterion_group! {
     name = benches;
-    config = Criterion::default().sample_size(10);
+    config = Criterion::default();
     targets = iteration
 }
 criterion_main!(benches);
