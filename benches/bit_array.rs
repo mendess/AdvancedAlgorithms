@@ -53,7 +53,7 @@ pub fn iteration(c: &mut Criterion) {
             &v,
             |b, v| {
                 b.iter(|| {
-                    for i in 0..ELEMS {
+                    for i in 0..black_box(ELEMS) {
                         black_box(v.get(i));
                     }
                 })
