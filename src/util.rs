@@ -1,5 +1,6 @@
 pub mod disjoint_set;
 pub mod bit_array;
+pub mod random_numbs;
 
 pub struct ExactSizeIter<I> {
     pub iter: I,
@@ -36,3 +37,48 @@ pub trait ToExactSizeIter: Iterator + Sized {
 }
 
 impl<I: Iterator> ToExactSizeIter for I {}
+
+pub fn jenkins(x: u64, seed: u64) -> u64 {
+    use std::num::Wrapping;
+    let mut a = Wrapping(seed.wrapping_add(x));
+    let mut b = Wrapping(seed);
+    let mut c = Wrapping(0x9e3779b97f4a7c13); /* the golden ratio; an arbitrary value */
+    a -= b;
+    a -= c;
+    a ^= c >> 43;
+    b -= c;
+    b -= a;
+    b ^= a << 9;
+    c -= a;
+    c -= b;
+    c ^= b >> 8;
+    a -= b;
+    a -= c;
+    a ^= c >> 38;
+    b -= c;
+    b -= a;
+    b ^= a << 23;
+    c -= a;
+    c -= b;
+    c ^= b >> 5;
+    a -= b;
+    a -= c;
+    a ^= c >> 35;
+    b -= c;
+    b -= a;
+    b ^= a << 49;
+    c -= a;
+    c -= b;
+    c ^= b >> 11;
+    a -= b;
+    a -= c;
+    a ^= c >> 12;
+    b -= c;
+    b -= a;
+    b ^= a << 18;
+    c -= a;
+    c -= b;
+    c ^= b >> 22;
+    c.0
+}
+

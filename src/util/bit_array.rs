@@ -11,6 +11,7 @@ use std::{
 ///
 /// If `register_size` is 5 then each number takes 5 bits of storage.
 ///
+#[derive(Clone)]
 pub struct BitArray {
     register_size: u8,
     elems: Box<[u8]>,
@@ -39,6 +40,10 @@ impl BitArray {
         self.capacity
     }
 
+    pub fn register_size(&self) -> u8 {
+        self.register_size
+    }
+
     pub fn set(&mut self, index: usize, value: u8) {
         // [xxxxxyyy|yyzzzzzw|wwww0000]
         //       s     e^^^^
@@ -46,12 +51,22 @@ impl BitArray {
         let start_bit = (index * self.register_size as usize) % WORD_SIZE;
         let end_bit = start_bit + self.register_size as usize;
         let slice_index = (index * self.register_size as usize) / WORD_SIZE;
+        let mask = (1 << self.register_size) - 1;
         if end_bit > WORD_SIZE {
-            self.elems[slice_index] |= value >> (end_bit - WORD_SIZE);
-            self.elems[slice_index + 1] |= value << ((2 * WORD_SIZE) - end_bit);
+            let offset = end_bit - WORD_SIZE;
+            let clear = !(mask >> offset);
+            self.elems[slice_index] &= clear;
+            self.elems[slice_index] |= value >> offset;
+
+            let offset = (2 * WORD_SIZE) - end_bit;
+            let clear = !(mask << offset);
+            self.elems[slice_index + 1] &= clear;
+            self.elems[slice_index + 1] |= value << offset;
         } else {
-            let value = value << (WORD_SIZE - end_bit);
-            self.elems[slice_index] |= value;
+            let offset = WORD_SIZE - end_bit;
+            let clear = !(mask << offset);
+            self.elems[slice_index] &= clear;
+            self.elems[slice_index] |= value << offset;
         }
     }
 
@@ -94,12 +109,26 @@ impl BitArray {
     pub fn iter3(&self) -> impl Iterator<Item = u8> + '_ {
         (0..self.capacity).map(move |i| self.get(i))
     }
+
+    pub fn max(&mut self, other: &Self) -> bool {
+        let mut modified = false;
+        for i in 0..self.capacity {
+            let a = self.get(i);
+            let b = other.get(i);
+            let max = u8::max(a, b);
+            self.set(i, max);
+            modified = modified || max != a;
+        }
+        modified
+    }
 }
 
+// #[inline] TODO: uncomment
 const fn init_left_mask(r_size: usize) -> u8 {
     ((init_right_mask(r_size) as u16) << (WORD_SIZE - r_size)) as u8
 }
 
+// #[inline] TODO: uncomment
 const fn init_right_mask(r_size: usize) -> u8 {
     ((1u16 << r_size) - 1) as u8
 }

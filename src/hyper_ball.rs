@@ -1,17 +1,20 @@
 pub mod hyper_counters;
-pub mod random_numbs;
 
 use crate::graphs::{csr::CSR, *};
-use hyper_counters::{HyperLogLog, B};
+use hyper_counters::HyperLogLogCounter;
 
-struct HyperBall {
-    counters: Box<[HyperLogLog<usize>]>,
+#[derive(Clone)]
+struct HyperBall<H: HyperLogLogCounter<usize>> {
+    counters: Box<[H]>,
 }
 
-impl HyperBall {
-    fn new(n: usize, b: B) -> Self {
+impl<H: HyperLogLogCounter<usize> + Clone> HyperBall<H> {
+    fn new<F>(n: usize, f: F) -> Self
+    where
+        F: Fn() -> H,
+    {
         Self {
-            counters: vec![HyperLogLog::new(b); n].into(),
+            counters: vec![f(); n].into(),
         }
     }
 
@@ -20,14 +23,18 @@ impl HyperBall {
         if a == b {
             return false;
         }
-        let a_ptr = &mut self.counters[a] as *mut HyperLogLog<usize>;
-        let b_ptr = &mut self.counters[b] as *mut HyperLogLog<usize>;
+        let a_ptr = &mut self.counters[a] as *mut H;
+        let b_ptr = &mut self.counters[b] as *mut H;
         unsafe { (*a_ptr).union_onto(&mut *b_ptr) }
     }
 }
 
-pub fn hyper_ball(g: &CSR) -> f64 {
-    let mut ball = HyperBall::new(g.vertices(), B::B4);
+pub fn hyper_ball<F, H>(g: &CSR, f: F) -> f64
+where
+    H: HyperLogLogCounter<usize> + Clone,
+    F: Fn() -> H,
+{
+    let mut ball = HyperBall::new(g.vertices(), f);
     for v in g.nodes() {
         ball.counters[v].register(v);
     }
@@ -44,16 +51,23 @@ pub fn hyper_ball(g: &CSR) -> f64 {
     0.0
 }
 
-
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{hyper_counters::*, *};
     use crate::graphs::{csr::CSR, test_graphs::graph_one};
 
     #[test]
-    fn run() {
+    fn run_normal() {
         let g = graph_one::<CSR>();
-        let apl = hyper_ball(&g);
+        let apl = hyper_ball(&g, || HyperLogLog::new(B::B4));
+        eprintln!("APL: {}", apl);
+        // assert!(3. < apl && apl < 4.);
+    }
+
+    #[test]
+    fn run_compact() {
+        let g = graph_one::<CSR>();
+        let apl = hyper_ball(&g, || CompactHyperLogLog::new(B::B4, g.vertices()));
         eprintln!("APL: {}", apl);
         // assert!(3. < apl && apl < 4.);
     }
