@@ -33,7 +33,6 @@ where
     let mut t = 0;
     let mut new_counters: Box<[H]> = ball.counters.clone();
     while modified {
-        eprintln!("T: {}", t);
         modified = false;
         for (v, successors) in g.neighbourhoods().enumerate() {
             new_counters[v].clone_from(&ball.counters[v]);

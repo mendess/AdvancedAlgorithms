@@ -1,6 +1,10 @@
 use aava::{
     algorithms::apl,
-    graphs::{edge_list::EdgeList, test_graphs::random_graph_er, FromEdges},
+    graphs::{csr::CSR, edge_list::EdgeList, test_graphs::random_graph_er, FromEdges, Graph},
+    hyper_ball::{
+        hyper_ball,
+        hyper_counters::{CompactHyperLogLog, HyperLogLog, B},
+    },
 };
 use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion, Throughput};
 use rand::{distributions::Distribution, rngs::SmallRng, SeedableRng};
@@ -11,8 +15,12 @@ fn make_rng() -> SmallRng {
     SmallRng::seed_from_u64(0x0DDB1A5E5BAD5EEDu64)
 }
 
-fn gen_graph(n: usize, p: f64) -> EdgeList {
-    EdgeList::from_edges(n, random_graph_er(n, p, make_rng()))
+fn gen_graph<G>(n: usize, p: f64) -> G
+where
+    G: FromEdges,
+    G: Graph<NodeWeight = (), EdgeWeight = ()>,
+{
+    G::from_edges(n, random_graph_er(n, p, make_rng()))
 }
 
 pub fn bench(c: &mut Criterion) {
@@ -31,12 +39,33 @@ pub fn bench(c: &mut Criterion) {
         .collect::<Vec<_>>();
     for (n, p, e) in params {
         group.throughput(Throughput::Elements(e as u64));
+        group.bench_function(BenchmarkId::new("apl", format!("{}_{}_{}", n, p, e)), |b| {
+            b.iter_batched(
+                || gen_graph::<EdgeList>(n, p),
+                |mut graph| apl::apl(&mut graph),
+                BatchSize::SmallInput,
+            )
+        });
         group.bench_function(
-            BenchmarkId::new("apl", format!("{}_{}_{}", n, p, e)),
+            BenchmarkId::new("hyperLogLog", format!("{}_{}_{}", n, p, e)),
             |b| {
                 b.iter_batched(
-                    || gen_graph(n, p),
-                    |mut graph| apl::apl(&mut graph),
+                    || gen_graph::<CSR>(n, p),
+                    |graph| {
+                        hyper_ball(&graph, || HyperLogLog::new(B::B4));
+                    },
+                    BatchSize::SmallInput,
+                )
+            },
+        );
+        group.bench_function(
+            BenchmarkId::new("compact_hyperLogLog", format!("{}_{}_{}", n, p, e)),
+            |b| {
+                b.iter_batched(
+                    || gen_graph::<CSR>(n, p),
+                    |graph| {
+                        hyper_ball(&graph, || CompactHyperLogLog::new(B::B4, graph.vertices()));
+                    },
                     BatchSize::SmallInput,
                 )
             },
