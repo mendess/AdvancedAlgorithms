@@ -7,7 +7,7 @@ pub use hyperloglog::HyperLogLog;
 pub trait HyperLogLogCounter<T> {
     fn register(&mut self, t: T);
     fn estimate(&self) -> f64;
-    fn union_onto(&mut self, other: &Self) -> bool;
+    fn union_onto(&self, other: &mut Self) -> bool;
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -70,11 +70,53 @@ mod tests {
     fn equivalence() {
         let seed = crate::util::random_numbs::random_seed();
         let mut h1 = HyperLogLog::new_with_seed(B::B4, seed);
-        let mut h2 = CompactHyperLogLog::new_with_seed(B::B4, 1_0000, seed);
-        for i in 0..1_0000 {
-            h1.register(i);
-            h2.register(i);
-            assert_eq!(h1.state(), h2.state(), "Equivalence test failed at i = {}", i);
+        let mut h2 = CompactHyperLogLog::new_with_seed(B::B4, 10_000, seed);
+        for i in 0..10_000 {
+            let value = rand::random::<i32>();
+            h1.register(value);
+            h2.register(value);
+            assert_eq!(
+                h1.state(),
+                h2.state(),
+                "Equivalence test failed at i = {}",
+                i
+            );
+        }
+    }
+
+    #[test]
+    fn equivalence_after_union() {
+        let seed = crate::util::random_numbs::random_seed();
+        let mut h1s = vec![HyperLogLog::new_with_seed(B::B4, seed); 16];
+        let mut h2s = vec![CompactHyperLogLog::new_with_seed(B::B4, 10_000, seed)];
+        for i in 0..10_000 {
+            let value = rand::random::<i32>();
+            for (h1, h2) in h1s.iter_mut().zip(h2s.iter_mut()) {
+                h1.register(value);
+                h2.register(value);
+                assert_eq!(
+                    h1.state(),
+                    h2.state(),
+                    "Equivalence test failed at i = {}",
+                    i
+                );
+            }
+        }
+        for i in 0..500 {
+            let (h1, t) = h1s.split_at_mut(1);
+            for w in t {
+                w.union_onto(&mut h1[0]);
+            }
+            let (h2, t) = h2s.split_at_mut(1);
+            for w in t {
+                w.union_onto(&mut h2[0]);
+            }
+            assert_eq!(
+                h1[0].state(),
+                h2[0].state(),
+                "Equivalence test failed at i = {}",
+                i
+            );
         }
     }
 }

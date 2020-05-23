@@ -13,7 +13,7 @@ const TWO_POW_32: f64 = (1u64 << 32) as f64;
 /// - Word size [16, 32, 64]
 /// - b
 /// - m = 2^b
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct HyperLogLog<T, H = BuildHasherDefault<FxHasher>> {
     registers: Box<[u8]>,
     m_minus_1: u64,
@@ -22,6 +22,31 @@ pub struct HyperLogLog<T, H = BuildHasherDefault<FxHasher>> {
     alpha_mm: f64,
     seed: u64,
     _marker: PhantomData<T>,
+}
+
+impl<T, H: Clone> Clone for HyperLogLog<T, H> {
+    fn clone(&self) -> Self {
+        Self {
+            registers: self.registers.clone(),
+            hasher: self.hasher.clone(),
+            alpha_mm: self.alpha_mm.clone(),
+            ..*self
+        }
+    }
+
+    fn clone_from(&mut self, other: &Self) {
+        if self.registers.len() == other.registers.len() {
+            self.registers.copy_from_slice(&other.registers);
+        } else {
+            self.registers.clone_from(&other.registers);
+        }
+        self.m_minus_1 = other.m_minus_1;
+        self.b = other.b;
+        self.hasher.clone_from(&other.hasher);
+        self.alpha_mm.clone_from(&other.alpha_mm);
+        self.seed = other.seed;
+        self._marker = other._marker;
+    }
 }
 
 impl<T> HyperLogLog<T, BuildHasherDefault<FxHasher>> {
@@ -59,7 +84,8 @@ impl<T, H> HyperLogLog<T, H> {
         )
     }
 
-    pub fn state(&self) -> Box<[u8]> {
+    #[cfg(test)]
+    pub(crate) fn state(&self) -> Box<[u8]> {
         self.registers.clone()
     }
 }
@@ -118,14 +144,14 @@ impl<T: Hash, H: BuildHasher> HyperLogLogCounter<T> for HyperLogLog<T, H> {
         }
     }
 
-    fn union_onto(&mut self, other: &Self) -> bool {
+    fn union_onto(&self, other: &mut Self) -> bool {
         self.registers
-            .iter_mut()
-            .zip(other.registers.iter())
-            .any(|(a, b)| {
-                let old_a = *a;
-                *a = u8::max(*a, *b);
-                old_a != *a
+            .iter()
+            .zip(other.registers.iter_mut())
+            .any(|(s, o)| {
+                let old_o = *o;
+                *o = u8::max(*s, *o);
+                old_o != *o
             })
     }
 }

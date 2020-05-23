@@ -66,7 +66,8 @@ impl<T, H> CompactHyperLogLog<T, H> {
         )
     }
 
-    pub fn state(&self) -> Box<[u8]> {
+    #[cfg(test)]
+    pub(crate) fn state(&self) -> Box<[u8]> {
         (0..self.registers.len())
             .map(|i| self.registers.get(i))
             .collect::<Vec<_>>()
@@ -126,8 +127,8 @@ where
     }
 
     #[inline]
-    fn union_onto(&mut self, other: &Self) -> bool {
-        self.registers.max(&other.registers)
+    fn union_onto(&self, other: &mut Self) -> bool {
+        self.registers.max(&mut other.registers)
     }
 }
 

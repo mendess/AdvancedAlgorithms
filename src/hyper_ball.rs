@@ -17,16 +17,6 @@ impl<H: HyperLogLogCounter<usize> + Clone> HyperBall<H> {
             counters: vec![f(); n].into(),
         }
     }
-
-    #[inline]
-    fn union(&mut self, a: usize, b: usize) -> bool {
-        if a == b {
-            return false;
-        }
-        let a_ptr = &mut self.counters[a] as *mut H;
-        let b_ptr = &mut self.counters[b] as *mut H;
-        unsafe { (*a_ptr).union_onto(&mut *b_ptr) }
-    }
 }
 
 pub fn hyper_ball<F, H>(g: &CSR, f: F) -> f64
@@ -38,37 +28,64 @@ where
     for v in g.nodes() {
         ball.counters[v].register(v);
     }
+    let mut apls = vec![0.0; g.vertices()].into_boxed_slice();
     let mut modified = true;
+    let mut t = 0;
+    let mut new_counters: Box<[H]> = ball.counters.clone();
     while modified {
+        eprintln!("T: {}", t);
         modified = false;
         for (v, successors) in g.neighbourhoods().enumerate() {
+            new_counters[v].clone_from(&ball.counters[v]);
+            let a = &mut new_counters[v];
             for &w in successors {
-                modified = bool::max(modified, ball.union(v, w));
+                modified = bool::max(ball.counters[w].union_onto(a), modified);
             }
-            // TODO: Calc something here
+            apls[v] += t as f64 * (a.estimate() - ball.counters[v].estimate());
         }
+        new_counters
+            .iter_mut()
+            .zip(ball.counters.iter_mut())
+            .for_each(|(new, old)| std::mem::swap(old, new));
+        t += 1;
     }
-    0.0
+    apls.iter().sum::<f64>() / apls.len() as f64
 }
 
 #[cfg(test)]
 mod tests {
     use super::{hyper_counters::*, *};
     use crate::graphs::{csr::CSR, test_graphs::graph_one};
+    const SEED: u64 = 0xBAD5EED;
 
     #[test]
     fn run_normal() {
         let g = graph_one::<CSR>();
-        let apl = hyper_ball(&g, || HyperLogLog::new(B::B4));
+        let apl = hyper_ball(&g, || HyperLogLog::new_with_seed(B::B4, SEED));
         eprintln!("APL: {}", apl);
-        // assert!(3. < apl && apl < 4.);
+        assert!(3. < apl && apl < 4.);
     }
 
     #[test]
     fn run_compact() {
         let g = graph_one::<CSR>();
-        let apl = hyper_ball(&g, || CompactHyperLogLog::new(B::B4, g.vertices()));
+        let apl = hyper_ball(&g, || {
+            CompactHyperLogLog::new_with_seed(B::B4, g.vertices(), SEED)
+        });
         eprintln!("APL: {}", apl);
-        // assert!(3. < apl && apl < 4.);
+        assert!(3. < apl && apl < 4.);
+    }
+
+    #[test]
+    fn equivalence() {
+        let g = graph_one::<CSR>();
+        assert_eq!(
+            hyper_ball(&g, || HyperLogLog::new_with_seed(B::B4, SEED)),
+            hyper_ball(&g, || CompactHyperLogLog::new_with_seed(
+                B::B4,
+                g.vertices(),
+                SEED
+            ))
+        )
     }
 }

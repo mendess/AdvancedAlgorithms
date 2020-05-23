@@ -110,14 +110,14 @@ impl BitArray {
         (0..self.capacity).map(move |i| self.get(i))
     }
 
-    pub fn max(&mut self, other: &Self) -> bool {
+    pub fn max(&self, other: &mut Self) -> bool {
         let mut modified = false;
         for i in 0..self.capacity {
-            let a = self.get(i);
-            let b = other.get(i);
-            let max = u8::max(a, b);
-            self.set(i, max);
-            modified = modified || max != a;
+            let s = self.get(i);
+            let o = other.get(i);
+            let max = u8::max(s, o);
+            other.set(i, max);
+            modified = modified || max != o;
         }
         modified
     }
