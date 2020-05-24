@@ -30,6 +30,6 @@ mod tests {
     #[test]
     fn apl0() {
         let apl = super::apl(&test_graphs::graph_one::<EdgeList>());
-        assert!(apl >= 3.145 && apl <= 3.18)
+        approx::assert_abs_diff_eq!(apl, test_graphs::GRAPH_ONE_APL)
     }
 }

@@ -45,7 +45,7 @@ where
         new_counters
             .iter_mut()
             .zip(ball.counters.iter_mut())
-            .for_each(|(new, old)| std::mem::swap(old, new));
+            .for_each(|(new, old)| std::mem::swap(new, old));
         t += 1;
     }
     apls.iter().sum::<f64>() / apls.len() as f64
@@ -54,7 +54,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::{hyper_counters::*, *};
-    use crate::graphs::{csr::CSR, test_graphs::graph_one};
+    use crate::graphs::{csr::CSR, test_graphs::{GRAPH_ONE_APL, graph_one}};
     const SEED: u64 = 0xBAD5EED;
 
     #[test]
@@ -62,7 +62,7 @@ mod tests {
         let g = graph_one::<CSR>();
         let apl = hyper_ball(&g, || HyperLogLog::new_with_seed(B::B4, SEED));
         eprintln!("APL: {}", apl);
-        assert!(3. < apl && apl < 4.);
+        approx::assert_relative_eq!(apl, GRAPH_ONE_APL, max_relative = 1.0);
     }
 
     #[test]
@@ -72,7 +72,7 @@ mod tests {
             CompactHyperLogLog::new_with_seed(B::B4, g.vertices(), SEED)
         });
         eprintln!("APL: {}", apl);
-        assert!(3. < apl && apl < 4.);
+        approx::assert_relative_eq!(apl, GRAPH_ONE_APL, max_relative = 1.0);
     }
 
     #[test]

@@ -8,7 +8,8 @@ use rand_distr::Binomial;
 use rustc_hash::FxHashSet as HashSet;
 use std::convert::TryInto;
 
-pub static GRAPH_ONE_MIN_CUT: [(usize, usize); 3] = [(2_usize, 6_usize), (3, 7), (4, 5)];
+pub const GRAPH_ONE_MIN_CUT: [(usize, usize); 3] = [(2_usize, 6_usize), (3, 7), (4, 5)];
+pub const GRAPH_ONE_APL: f64 = 3.1555555555555554;
 pub fn graph_one<G: FromEdges<NodeWeight = (), EdgeWeight = ()>>() -> G {
     graph!(G = (10) {
        0 => 1;
