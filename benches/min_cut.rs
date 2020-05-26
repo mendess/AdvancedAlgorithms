@@ -1,6 +1,7 @@
 use aava::{
     algorithms::min_cut,
     graphs::{edge_list::EdgeList, test_graphs::random_graph_er, FromEdges},
+    util::disjoint_set::{PathCompression, PathHalving, PathSplitting, UndoDisjointSet},
 };
 use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion, Throughput};
 use rand::{distributions::Distribution, rngs::SmallRng, SeedableRng};
@@ -13,6 +14,41 @@ fn make_rng() -> SmallRng {
 
 fn gen_graph(n: usize, p: f64) -> EdgeList {
     EdgeList::from_edges(n, random_graph_er(n, p, make_rng()))
+}
+
+macro_rules! bench_karger_stein {
+    ($group:expr, $t:ty, $n:expr, $p: expr, $e:expr) => {
+        $group.bench_function(
+            BenchmarkId::new(
+                &format!("fast_karger_stein {}", stringify!($t)),
+                format!("{}_{}_{}", $n, $p, $e),
+            ),
+            |b| {
+                b.iter_batched(
+                    || gen_graph($n, $p),
+                    |mut graph| min_cut::fast_karger_stein::<_, UndoDisjointSet<$t>>(&mut graph),
+                    BatchSize::SmallInput,
+                )
+            },
+        );
+        $group.bench_function(
+            BenchmarkId::new(
+                &format!("fast_karger_stein_count_{}", stringify!($t)),
+                format!("{}_{}_{}", $n, $p, $e),
+            ),
+            |b| {
+                b.iter_batched(
+                    || gen_graph($n, $p),
+                    |mut graph| {
+                        min_cut::count::fast_karger_stein_count::<_, UndoDisjointSet<$t>>(
+                            &mut graph,
+                        )
+                    },
+                    BatchSize::SmallInput,
+                )
+            },
+        );
+    };
 }
 
 pub fn bench(c: &mut Criterion) {
@@ -42,16 +78,6 @@ pub fn bench(c: &mut Criterion) {
             },
         );
         group.bench_function(
-            BenchmarkId::new("fast_karger_stein", format!("{}_{}_{}", n, p, e)),
-            |b| {
-                b.iter_batched(
-                    || gen_graph(n, p),
-                    |mut graph| min_cut::fast_karger_stein(&mut graph),
-                    BatchSize::SmallInput,
-                )
-            },
-        );
-        group.bench_function(
             BenchmarkId::new("karger_stein_count", format!("{}_{}_{}", n, p, e)),
             |b| {
                 b.iter_batched(
@@ -61,16 +87,9 @@ pub fn bench(c: &mut Criterion) {
                 )
             },
         );
-        group.bench_function(
-            BenchmarkId::new("fast_karger_stein_count", format!("{}_{}_{}", n, p, e)),
-            |b| {
-                b.iter_batched(
-                    || gen_graph(n, p),
-                    |mut graph| min_cut::count::fast_karger_stein_count(&mut graph),
-                    BatchSize::SmallInput,
-                )
-            },
-        );
+        bench_karger_stein!(group, PathCompression, n, p, e);
+        bench_karger_stein!(group, PathSplitting, n, p, e);
+        bench_karger_stein!(group, PathHalving, n, p, e);
     }
     group.finish();
 }

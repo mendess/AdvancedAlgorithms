@@ -2,7 +2,6 @@ use crate::{
     graphs::{EdgeListGraph, WEdge},
     util::disjoint_set::*,
 };
-use itertools::Itertools;
 use rand::{
     distributions::uniform::{UniformInt, UniformSampler},
     thread_rng,
@@ -17,7 +16,7 @@ fn contract<N, E, D>(
 where
     N: Clone,
     E: Clone,
-    D: DisjointSet + std::fmt::Debug,
+    D: DisjointSet,
 {
     let mut rng = thread_rng();
     let mut cur = *cur_node;
@@ -30,13 +29,13 @@ where
         cur += 1;
     }
     *cur_node = cur;
-    debug_assert_eq!(
-        ds.components(),
-        comp,
-        "Couldn't contract: {:?}\nGraph: {:?}",
-        ds,
-        edges.iter().map(|e| (e.0, e.1)).format(",")
-    );
+    // debug_assert_eq!(
+    //     ds.components(),
+    //     comp,
+    //     "Couldn't contract: {:?}\nGraph: {:?}",
+    //     ds,
+    //     edges.iter().map(|e| (e.0, e.1)).format(",")
+    // );
     if comp == 2 {
         edges
             .iter()
@@ -93,14 +92,15 @@ where
         .unwrap()
 }
 
-fn fast_min_cut<N, E>(
+fn fast_min_cut<N, E, U>(
     edges: &mut [WEdge<N, E>],
-    ds: &mut UndoDisjointSet,
+    ds: &mut U,
     current_node: usize,
 ) -> Vec<WEdge<N, E>>
 where
     N: Clone,
     E: Clone,
+    U: Undoable,
 {
     if ds.components() < 6 {
         let mut cur = current_node;
@@ -126,18 +126,19 @@ where
     }
 }
 
-pub fn fast_karger_stein<G>(edges: &mut G) -> Vec<WEdge<G::NodeWeight, G::EdgeWeight>>
+pub fn fast_karger_stein<G, S>(edges: &mut G) -> Vec<WEdge<G::NodeWeight, G::EdgeWeight>>
 where
     G::NodeWeight: Clone,
     G::EdgeWeight: Clone,
     G: EdgeListGraph,
+    S: Undoable,
 {
     let n_vert = edges.vertices();
     let edges = edges.as_edges_mut();
     let log = (!n_vert).trailing_zeros();
     let runs = log * log + 2;
     (0..runs)
-        .map(|_| fast_min_cut(edges, &mut UndoDisjointSet::new(n_vert), 0))
+        .map(|_| fast_min_cut(edges, &mut S::new(n_vert), 0))
         .min_by_key(|cut| cut.len())
         .unwrap()
 }
@@ -219,14 +220,15 @@ pub mod count {
             .unwrap()
     }
 
-    fn fast_min_cut_count<N, E>(
+    fn fast_min_cut_count<N, E, U>(
         edges: &mut [WEdge<N, E>],
-        ds: &mut UndoDisjointSet,
+        ds: &mut U,
         current_node: usize,
     ) -> usize
     where
         N: Clone,
         E: Clone,
+        U: Undoable,
     {
         if ds.components() < 6 {
             let mut cur = current_node;
@@ -247,18 +249,19 @@ pub mod count {
         }
     }
 
-    pub fn fast_karger_stein_count<G>(edges: &mut G) -> usize
+    pub fn fast_karger_stein_count<G, U>(edges: &mut G) -> usize
     where
         G::NodeWeight: Clone,
         G::EdgeWeight: Clone,
         G: EdgeListGraph,
+        U: Undoable,
     {
         let n_vert = edges.vertices();
         let edges = edges.as_edges_mut();
         let log = (!n_vert).trailing_zeros();
         let runs = log * log + 2;
         (0..runs)
-            .map(|_| fast_min_cut_count(edges, &mut UndoDisjointSet::new(n_vert), 0))
+            .map(|_| fast_min_cut_count(edges, &mut U::new(n_vert), 0))
             .min()
             .unwrap()
     }
@@ -266,7 +269,10 @@ pub mod count {
 
 #[cfg(test)]
 mod test {
-    use crate::graphs::{edge_list::EdgeList, test_graphs, FromEdges};
+    use crate::{
+        graphs::{edge_list::EdgeList, test_graphs, FromEdges},
+        util::disjoint_set::{PathCompression, PathHalving, PathSplitting, UndoDisjointSet},
+    };
 
     const SUCCSESS_RATE: usize = 7;
 
@@ -278,38 +284,53 @@ mod test {
         assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
     }
 
-    #[test]
-    fn fast_karger_stein() {
-        let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
-            super::fast_karger_stein(&mut test_graphs::graph_one::<EdgeList>())
-        });
-        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
-    }
-
-    #[test]
-    fn karger_stein_random() {
-        let mut g = Vec::new();
-        for i in 0..10 {
-            for j in 0..10 {
-                if i != j {
-                    g.push((i, j, (), ()));
+    macro_rules! test_fast_karger_stein {
+        ($t:ty) => {
+            paste::item! {
+                #[test]
+                #[allow(non_snake_case)]
+                fn [<fast_karger_stein_ $t>]() {
+                    let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
+                        super::fast_karger_stein::<_, UndoDisjointSet<$t>>(
+                            &mut test_graphs::graph_one::<EdgeList>(),
+                        )
+                    });
+                    assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+                }
+                #[test]
+                #[allow(non_snake_case)]
+                fn [<karger_stein_random_ $t>]() {
+                    let mut g = Vec::new();
+                    for i in 0..10 {
+                        for j in 0..10 {
+                            if i != j {
+                                g.push((i, j, (), ()));
+                            }
+                        }
+                    }
+                    let g0 = g
+                        .iter()
+                        .map(|(a, b, _, _)| (a + 10, b + 10, (), ()))
+                        .collect::<Vec<_>>();
+                    g.extend(g0);
+                    let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
+                    for (a, b) in &min_cut {
+                        g.push((*a, *b, (), ()))
+                    }
+                    let succ = check_min_cut(&min_cut, || {
+                        super::fast_karger_stein::<_, UndoDisjointSet<$t>>(
+                            &mut EdgeList::from_edges(20, g.clone())
+                        )
+                    });
+                    assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
                 }
             }
-        }
-        let g0 = g
-            .iter()
-            .map(|(a, b, _, _)| (a + 10, b + 10, (), ()))
-            .collect::<Vec<_>>();
-        g.extend(g0);
-        let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
-        for (a, b) in &min_cut {
-            g.push((*a, *b, (), ()))
-        }
-        let succ = check_min_cut(&min_cut, || {
-            super::fast_karger_stein(&mut EdgeList::from_edges(20, g.clone()))
-        });
-        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+        };
     }
+
+    test_fast_karger_stein!(PathCompression);
+    test_fast_karger_stein!(PathHalving);
+    test_fast_karger_stein!(PathSplitting);
 
     #[cfg(test)]
     fn check_min_cut<F, N, E>(cut: &[(usize, usize)], attempts: F) -> usize
@@ -335,7 +356,10 @@ mod test {
     mod count {
         use super::super::count::*;
         use super::SUCCSESS_RATE;
-        use crate::graphs::{edge_list::EdgeList, FromEdges, test_graphs};
+        use crate::{
+            graphs::{edge_list::EdgeList, test_graphs, FromEdges},
+            util::disjoint_set::{PathCompression, PathHalving, PathSplitting, UndoDisjointSet},
+        };
 
         #[test]
         fn karger_stein() {
@@ -345,38 +369,54 @@ mod test {
             assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
         }
 
-        #[test]
-        fn fast_karger_stein() {
-            let succ = check_min_cut(test_graphs::GRAPH_ONE_MIN_CUT.len(), || {
-                fast_karger_stein_count(&mut test_graphs::graph_one::<EdgeList>())
-            });
-            assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
-        }
+        macro_rules! test_fast_karger_stein {
+            ($t:ty) => {
+                paste::item! {
+                    #[test]
+                    #[allow(non_snake_case)]
+                    fn [<fast_karger_stein_ $t>]() {
+                        let succ = check_min_cut(test_graphs::GRAPH_ONE_MIN_CUT.len(), || {
+                            fast_karger_stein_count::<_, UndoDisjointSet<$t>>(
+                                &mut test_graphs::graph_one::<EdgeList>()
+                            )
+                        });
+                        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+                    }
 
-        #[test]
-        fn karger_stein_random() {
-            let mut g = Vec::new();
-            for i in 0..10 {
-                for j in 0..10 {
-                    if i != j {
-                        g.push((i, j, (), ()));
+                    #[test]
+                    #[allow(non_snake_case)]
+                    fn [<karger_stein_random_ $t>]() {
+                        let mut g = Vec::new();
+                        for i in 0..10 {
+                            for j in 0..10 {
+                                if i != j {
+                                    g.push((i, j, (), ()));
+                                }
+                            }
+                        }
+                        let g0 = g
+                            .iter()
+                            .map(|(a, b, _, _)| (a + 10, b + 10, (), ()))
+                            .collect::<Vec<_>>();
+                        g.extend(g0);
+                        let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
+                        for (a, b) in &min_cut {
+                            g.push((*a, *b, (), ()))
+                        }
+                        let succ = check_min_cut(min_cut.len(), || {
+                            fast_karger_stein_count::<_, UndoDisjointSet<$t>>(
+                                &mut EdgeList::from_edges(20, g.clone())
+                            )
+                        });
+                        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
                     }
                 }
-            }
-            let g0 = g
-                .iter()
-                .map(|(a, b, _, _)| (a + 10, b + 10, (), ()))
-                .collect::<Vec<_>>();
-            g.extend(g0);
-            let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
-            for (a, b) in &min_cut {
-                g.push((*a, *b, (), ()))
-            }
-            let succ = check_min_cut(min_cut.len(), || {
-                fast_karger_stein_count(&mut EdgeList::from_edges(20, g.clone()))
-            });
-            assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+            };
         }
+
+        test_fast_karger_stein!(PathCompression);
+        test_fast_karger_stein!(PathHalving);
+        test_fast_karger_stein!(PathSplitting);
 
         #[cfg(test)]
         fn check_min_cut<F>(cut: usize, attempts: F) -> usize
