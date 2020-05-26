@@ -2,6 +2,7 @@ use crate::{
     graphs::{EdgeListGraph, WEdge},
     util::disjoint_set::*,
 };
+use itertools::Itertools;
 use rand::{
     distributions::uniform::{UniformInt, UniformSampler},
     thread_rng,
@@ -29,13 +30,12 @@ where
         cur += 1;
     }
     *cur_node = cur;
-    // debug_assert_eq!(
-    //     ds.components(),
-    //     comp,
-    //     "Couldn't contract: {:?}\nGraph: {:?}",
-    //     ds,
-    //     edges.iter().map(|e| (e.0, e.1)).format(",")
-    // );
+    debug_assert_eq!(
+        ds.components(),
+        comp,
+        "Couldn't contract\nGraph: {:?}",
+        edges.iter().map(|e| (e.0, e.1)).format(",")
+    );
     if comp == 2 {
         edges
             .iter()
@@ -150,8 +150,9 @@ where
 pub mod count {
     use crate::{
         graphs::{EdgeListGraph, WEdge},
-        util::disjoint_set::{UndoDisjointSet, FindMode, DisjointSet, SimpleDisjointSet},
+        util::disjoint_set::{DisjointSet, FindMode, SimpleDisjointSet, UndoDisjointSet},
     };
+    use itertools::Itertools;
     use rand::{
         distributions::uniform::{UniformInt, UniformSampler},
         thread_rng,
@@ -179,6 +180,12 @@ pub mod count {
             cur += 1;
         }
         *cur_node = cur;
+        debug_assert_eq!(
+            ds.components(),
+            comp,
+            "Couldn't contract\nGraph: {:?}",
+            edges.iter().map(|e| (e.0, e.1)).format(",")
+        );
         if comp == 2 {
             edges.iter().filter(|e| !ds.are_connected(e.0, e.1)).count()
         } else {

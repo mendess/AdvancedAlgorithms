@@ -41,6 +41,19 @@ macro_rules! bench_karger_stein_count {
     ($group:expr, $t:ty, $n:expr, $p: expr, $e:expr) => {
         $group.bench_function(
             BenchmarkId::new(
+                &format!("karger_stein_count_{}", stringify!($t)),
+                format!("{}_{}_{}", $n, $p, $e)
+            ),
+            |b| {
+                b.iter_batched(
+                    || gen_edge_list($n, $p),
+                    |mut graph| min_cut::count::karger_stein_count::<_, $t>(&mut graph),
+                    BatchSize::SmallInput,
+                )
+            },
+        );
+        $group.bench_function(
+            BenchmarkId::new(
                 &format!("fast_karger_stein_count_{}", stringify!($t)),
                 format!("{}_{}_{}", $n, $p, $e),
             ),
@@ -50,19 +63,6 @@ macro_rules! bench_karger_stein_count {
                     |mut graph| {
                         min_cut::count::fast_karger_stein_count::<_, $t>(&mut graph)
                     },
-                    BatchSize::SmallInput,
-                )
-            },
-        );
-        $group.bench_function(
-            BenchmarkId::new(
-                &format!("karger_stein_count_{}", stringify!($t)),
-                format!("{}_{}_{}", $n, $p, $e)
-            ),
-            |b| {
-                b.iter_batched(
-                    || gen_edge_list($n, $p),
-                    |mut graph| min_cut::count::karger_stein_count::<_, $t>(&mut graph),
                     BatchSize::SmallInput,
                 )
             },
