@@ -9,53 +9,113 @@ pub trait DisjointSet {
     fn components(&self) -> usize;
 }
 
-#[derive(Debug, Clone)]
-pub struct SimpleDisjointSet {
-    ids: Box<[usize]>,
-    ranks: Box<[u64]>,
-    components: usize,
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub struct PathCompression;
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub struct PathHalving;
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub struct PathSplitting;
+
+mod sealed {
+    pub trait Sealed {}
 }
+pub trait FindMode: sealed::Sealed {}
+impl<T> sealed::Sealed for T where T: FindMode {}
+impl FindMode for PathCompression {}
+impl FindMode for PathHalving {}
+impl FindMode for PathSplitting {}
 
-impl DisjointSet for SimpleDisjointSet {
-    fn new(components: usize) -> Self {
-        Self {
-            ranks: vec![0; components].into(),
-            ids: (0..components).collect::<Vec<_>>().into(),
-            components,
-        }
-    }
-
-    fn find(&mut self, id: usize) -> usize {
-        if self.ids[id] != id {
-            self.ids[id] = self.find(self.ids[id])
-        }
-        self.ids[id]
-    }
-
-    fn union(&mut self, i: usize, j: usize) {
-        let mut parent = self.find(i);
-        let mut child = self.find(j);
-        if self.ranks[parent] < self.ranks[child] {
-            std::mem::swap(&mut parent, &mut child)
-        }
-        self.ids[child] = parent;
-        self.ranks[parent] += 1;
-        self.components -= 1;
-    }
-
-    fn are_connected(&mut self, i: usize, j: usize) -> bool {
-        self.find(i) == self.find(j)
-    }
-
-    fn components(&self) -> usize {
-        self.components
-    }
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct SimpleDisjointSet<F: FindMode = PathCompression> {
+    nodes: Box<[Node]>,
+    components: usize,
+    _marker: PhantomData<F>,
 }
 
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq)]
 struct Node {
     id: usize,
     rank: u64,
+}
+
+macro_rules! impl_disjoint_for {
+    ($mode:ty => $find:item) => {
+        impl DisjointSet for SimpleDisjointSet<$mode> {
+            fn new(components: usize) -> Self {
+                Self {
+                    nodes: (0..components)
+                        .map(|i| Node { id: i, rank: 1 })
+                        .collect::<Vec<_>>()
+                        .into(),
+                    components,
+                    _marker: PhantomData,
+                }
+            }
+
+            fn union(&mut self, i: usize, j: usize) {
+                let mut parent = self.find(i);
+                let mut child = self.find(j);
+                if self.nodes[parent].rank < self.nodes[child].rank {
+                    std::mem::swap(&mut parent, &mut child)
+                }
+                self.nodes[child].id = parent;
+                self.nodes[parent].rank += 1;
+                self.components -= 1;
+            }
+
+            #[inline]
+            fn are_connected(&mut self, i: usize, j: usize) -> bool {
+                self.find(i) == self.find(j)
+            }
+
+            #[inline]
+            fn components(&self) -> usize {
+                self.components
+            }
+
+            $find
+        }
+    }
+}
+
+impl_disjoint_for!(PathHalving =>
+    fn find(&mut self, mut id: usize) -> usize {
+        while self.parent(id) != id {
+            *self.parent_ref(id) = self.parent(self.parent(id));
+            id = self.parent(id);
+        }
+        id
+    }
+);
+
+impl_disjoint_for!(PathCompression =>
+    fn find(&mut self, id: usize) -> usize {
+        if self.parent(id) != id {
+            *self.parent_ref(id) = self.find(self.parent(id));
+        }
+        self.nodes[id].id
+    }
+);
+impl_disjoint_for!(PathSplitting =>
+    fn find(&mut self, mut id: usize) -> usize {
+        while self.parent(id) != id {
+            id = self.parent(id);
+            *self.parent_ref(id) = self.parent(self.parent(id));
+        }
+        id
+    }
+);
+
+impl<F: FindMode> SimpleDisjointSet<F> {
+    #[inline]
+    fn parent(&self, id: usize) -> usize {
+        self.nodes[id].id
+    }
+
+    #[inline]
+    fn parent_ref(&mut self, id: usize) -> &mut usize {
+        &mut self.nodes[id].id
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq)]
@@ -107,149 +167,88 @@ impl History {
     }
 }
 
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub struct PathCompression;
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub struct PathHalving;
-#[derive(Clone, Copy, Eq, PartialEq)]
-pub struct PathSplitting;
-
-mod sealed {
-    pub trait Sealed {}
-}
-pub trait FindMode: sealed::Sealed {}
-impl<T> sealed::Sealed for T where T: FindMode {}
-impl FindMode for PathCompression {}
-impl FindMode for PathHalving {}
-impl FindMode for PathSplitting {}
-
 #[derive(Clone, Eq, PartialEq)]
 pub struct UndoDisjointSet<F: FindMode = PathCompression> {
-    components: usize,
-    num_sets: usize,
-    nodes: Box<[Node]>,
+    set: SimpleDisjointSet<F>,
     history: History,
-    _marker: PhantomData<F>,
 }
 
-macro_rules! impl_disjoint_for {
-    ($mode:ty => $find:item) => {
-        impl DisjointSet for UndoDisjointSet<$mode> {
-            fn components(&self) -> usize {
-                self.components
-            }
-
-            fn new(num_sets: usize) -> Self {
-                UndoDisjointSet {
-                    components: num_sets,
-                    num_sets,
-                    nodes: (0..num_sets)
-                        .map(|i| Node { id: i, rank: 1 })
-                        .collect::<Vec<_>>()
-                        .into(),
-                    history: Default::default(),
-                    _marker: PhantomData,
-                }
-            }
-
-            fn union(&mut self, i: usize, j: usize) {
-                let mut parent = self.find(i);
-                let mut child = self.find(j);
-                if parent == child {
-                    return;
-                }
-                let nodes = &mut self.nodes;
-                if nodes[parent].rank < nodes[child].rank {
-                    std::mem::swap(&mut parent, &mut child)
-                }
-                self.history
-                    .push(Change::new(parent, nodes[parent]).changed());
-                self.history.push(Change::new(child, nodes[child]));
-                nodes[child].id = parent;
-                nodes[parent].rank += 1;
-                self.components -= 1;
-            }
-
-            fn are_connected(&mut self, i: usize, j: usize) -> bool {
-                self.find(i) == self.find(j)
-            }
-
-            $find
-        }
-
-        impl Undoable for UndoDisjointSet<$mode> {
-            #[inline]
-            fn save_state(&mut self) {
-                self.history.save_point();
-            }
-
-            #[inline]
-            fn restore_state(&mut self) {
-                while let Some(Operation::Change(c)) = self.history.pop() {
-                    self.nodes[c.id] = c.old_state;
-                    self.components += usize::from(c.components_changed);
-                }
-            }
-        }
-    }
-}
-impl_disjoint_for!(PathHalving =>
-    fn find(&mut self, mut id: usize) -> usize {
-        while self.parent(id) != id {
-            *self.parent_ref(id) = self.parent(self.parent(id));
-            id = self.parent(id);
-        }
-        id
-    }
-);
-impl_disjoint_for!(PathCompression =>
-    fn find(&mut self, id: usize) -> usize {
-        if self.parent(id) != id {
-            *self.parent_ref(id) = self.find(self.parent(id));
-        }
-        self.nodes[id].id
-    }
-);
-impl_disjoint_for!(PathSplitting =>
-    fn find(&mut self, mut id: usize) -> usize {
-        while self.parent(id) != id {
-            id = self.parent(id);
-            *self.parent_ref(id) = self.parent(self.parent(id));
-        }
-        id
-    }
-);
-
-pub trait Undoable: DisjointSet {
-    fn save_state(&mut self);
-    fn restore_state(&mut self);
-}
-
-impl<F: FindMode> UndoDisjointSet<F> {
+impl<F: FindMode> DisjointSet for UndoDisjointSet<F>
+where
+    SimpleDisjointSet<F>: DisjointSet,
+{
     #[inline]
-    fn parent(&self, id: usize) -> usize {
-        self.nodes[id].id
+    fn components(&self) -> usize {
+        self.set.components()
     }
 
     #[inline]
-    fn parent_ref(&mut self, id: usize) -> &mut usize {
-        &mut self.nodes[id].id
+    fn new(components: usize) -> Self {
+        Self {
+            set: SimpleDisjointSet::new(components),
+            history: Default::default(),
+        }
+    }
+
+    #[inline]
+    fn find(&mut self, i: usize) -> usize {
+        self.set.find(i)
+    }
+
+    fn union(&mut self, i: usize, j: usize) {
+        let mut parent = self.set.find(i);
+        let mut child = self.set.find(j);
+        if parent == child {
+            return;
+        }
+        let nodes = &mut self.set.nodes;
+        if nodes[parent].rank < nodes[child].rank {
+            std::mem::swap(&mut parent, &mut child)
+        }
+        self.history
+            .push(Change::new(parent, nodes[parent]).changed());
+        self.history.push(Change::new(child, nodes[child]));
+        nodes[child].id = parent;
+        nodes[parent].rank += 1;
+        self.set.components -= 1;
+    }
+
+    #[inline]
+    fn are_connected(&mut self, i: usize, j: usize) -> bool {
+        self.set.are_connected(i, j)
     }
 }
+
+impl<F: FindMode> UndoDisjointSet<F>
+where
+    UndoDisjointSet<F>: DisjointSet,
+{
+    pub fn save_state(&mut self) {
+        self.history.save_point()
+    }
+
+    pub fn restore_state(&mut self) {
+        while let Some(Operation::Change(c)) = self.history.pop() {
+            self.set.nodes[c.id] = c.old_state;
+            self.set.components += usize::from(c.components_changed);
+        }
+    }
+}
+
 use std::fmt::{self, Debug};
 
-impl Debug for UndoDisjointSet {
+impl<F: FindMode> Debug for UndoDisjointSet<F> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f)?;
-        for i in 0..self.nodes.len() {
+        for i in 0..self.set.nodes.len() {
             write!(f, "{:2},", i)?;
         }
         writeln!(f)?;
-        for i in self.nodes.iter() {
+        for i in self.set.nodes.iter() {
             write!(f, "{:2},", i.id)?;
         }
         writeln!(f)?;
-        for i in self.nodes.iter() {
+        for i in self.set.nodes.iter() {
             write!(f, "{:2},", i.rank)?;
         }
         Ok(())
@@ -262,7 +261,7 @@ mod tests {
 
     #[test]
     fn undo_union_test() {
-        let mut ds = UndoDisjointSet::new(10);
+        let mut ds = UndoDisjointSet::<PathCompression>::new(10);
         let anchor = ds.clone();
         ds.save_state();
         ds.union(0, 3);
@@ -275,13 +274,13 @@ mod tests {
 
     #[test]
     fn undo_find_test() {
-        let ds = UndoDisjointSet::new(10);
+        let ds = UndoDisjointSet::<PathCompression>::new(10);
         assert_eq!(find_test(ds.clone()), ds)
     }
 
     #[test]
     fn undo_union_find_test() {
-        let mut ds = UndoDisjointSet::new(10);
+        let mut ds = UndoDisjointSet::<PathCompression>::new(10);
         let anchor = ds.clone();
         ds.save_state();
         ds.union(3, 6);
@@ -301,7 +300,7 @@ mod tests {
 
     #[test]
     fn simple_union_test() {
-        let mut ds = SimpleDisjointSet::new(10);
+        let mut ds = SimpleDisjointSet::<PathCompression>::new(10);
         ds.union(0, 3);
         ds.union(2, 4);
         ds.union(0, 6);
@@ -311,12 +310,12 @@ mod tests {
 
     #[test]
     fn simple_find_test() {
-        find_test(SimpleDisjointSet::new(10));
+        find_test(SimpleDisjointSet::<PathCompression>::new(10));
     }
 
     #[test]
     fn simple_connected_test() {
-        connected_test(SimpleDisjointSet::new(10))
+        connected_test(SimpleDisjointSet::<PathCompression>::new(10))
     }
 
     #[cfg(test)]
@@ -326,6 +325,7 @@ mod tests {
         }
         ds
     }
+
     #[cfg(test)]
     fn connected_test<D: DisjointSet>(mut ds: D) {
         ds.union(3, 6);

@@ -55,7 +55,7 @@ fn min_cut<N, E, D>(
 where
     N: Clone,
     E: Clone,
-    D: DisjointSet + Clone + std::fmt::Debug,
+    D: DisjointSet + Clone,
 {
     if ds.components() < 6 {
         contract(edges, &mut ds, 2, &mut current_node)
@@ -76,31 +76,34 @@ where
     }
 }
 
-pub fn karger_stein<G>(edges: &mut G) -> Vec<WEdge<G::NodeWeight, G::EdgeWeight>>
+pub fn karger_stein<G, F>(edges: &mut G) -> Vec<WEdge<G::NodeWeight, G::EdgeWeight>>
 where
     G::NodeWeight: Clone,
     G::EdgeWeight: Clone,
     G: EdgeListGraph,
+    F: FindMode,
+    SimpleDisjointSet<F>: DisjointSet + Clone,
 {
     let n_vert = edges.vertices();
     let edges = edges.as_edges_mut();
     let log = (!n_vert).trailing_zeros();
     let runs = log * log + 2;
     (0..runs)
-        .map(|_| min_cut(edges, SimpleDisjointSet::new(n_vert), 0))
+        .map(|_| min_cut(edges, SimpleDisjointSet::<F>::new(n_vert), 0))
         .min_by_key(|cut| cut.len())
         .unwrap()
 }
 
-fn fast_min_cut<N, E, U>(
+fn fast_min_cut<N, E, F>(
     edges: &mut [WEdge<N, E>],
-    ds: &mut U,
+    ds: &mut UndoDisjointSet<F>,
     current_node: usize,
 ) -> Vec<WEdge<N, E>>
 where
     N: Clone,
     E: Clone,
-    U: Undoable,
+    F: FindMode,
+    UndoDisjointSet<F>: DisjointSet,
 {
     if ds.components() < 6 {
         let mut cur = current_node;
@@ -126,19 +129,20 @@ where
     }
 }
 
-pub fn fast_karger_stein<G, S>(edges: &mut G) -> Vec<WEdge<G::NodeWeight, G::EdgeWeight>>
+pub fn fast_karger_stein<G, F>(edges: &mut G) -> Vec<WEdge<G::NodeWeight, G::EdgeWeight>>
 where
     G::NodeWeight: Clone,
     G::EdgeWeight: Clone,
     G: EdgeListGraph,
-    S: Undoable,
+    F: FindMode,
+    UndoDisjointSet<F>: DisjointSet,
 {
     let n_vert = edges.vertices();
     let edges = edges.as_edges_mut();
     let log = (!n_vert).trailing_zeros();
     let runs = log * log + 2;
     (0..runs)
-        .map(|_| fast_min_cut(edges, &mut S::new(n_vert), 0))
+        .map(|_| fast_min_cut(edges, &mut UndoDisjointSet::<F>::new(n_vert), 0))
         .min_by_key(|cut| cut.len())
         .unwrap()
 }
@@ -146,7 +150,7 @@ where
 pub mod count {
     use crate::{
         graphs::{EdgeListGraph, WEdge},
-        util::disjoint_set::*,
+        util::disjoint_set::{UndoDisjointSet, FindMode, DisjointSet, SimpleDisjointSet},
     };
     use rand::{
         distributions::uniform::{UniformInt, UniformSampler},
@@ -204,11 +208,13 @@ pub mod count {
         }
     }
 
-    pub fn karger_stein_count<G>(edges: &mut G) -> usize
+    pub fn karger_stein_count<G, F>(edges: &mut G) -> usize
     where
         G::NodeWeight: Clone,
         G::EdgeWeight: Clone,
         G: EdgeListGraph,
+        F: FindMode,
+        SimpleDisjointSet<F>: DisjointSet + Clone,
     {
         let n_vert = edges.vertices();
         let edges = edges.as_edges_mut();
@@ -220,15 +226,16 @@ pub mod count {
             .unwrap()
     }
 
-    fn fast_min_cut_count<N, E, U>(
+    fn fast_min_cut_count<N, E, F>(
         edges: &mut [WEdge<N, E>],
-        ds: &mut U,
+        ds: &mut UndoDisjointSet<F>,
         current_node: usize,
     ) -> usize
     where
         N: Clone,
         E: Clone,
-        U: Undoable,
+        F: FindMode,
+        UndoDisjointSet<F>: DisjointSet,
     {
         if ds.components() < 6 {
             let mut cur = current_node;
@@ -249,19 +256,20 @@ pub mod count {
         }
     }
 
-    pub fn fast_karger_stein_count<G, U>(edges: &mut G) -> usize
+    pub fn fast_karger_stein_count<G, F>(edges: &mut G) -> usize
     where
         G::NodeWeight: Clone,
         G::EdgeWeight: Clone,
         G: EdgeListGraph,
-        U: Undoable,
+        F: FindMode,
+        UndoDisjointSet<F>: DisjointSet,
     {
         let n_vert = edges.vertices();
         let edges = edges.as_edges_mut();
         let log = (!n_vert).trailing_zeros();
         let runs = log * log + 2;
         (0..runs)
-            .map(|_| fast_min_cut_count(edges, &mut U::new(n_vert), 0))
+            .map(|_| fast_min_cut_count(edges, &mut UndoDisjointSet::<F>::new(n_vert), 0))
             .min()
             .unwrap()
     }
@@ -271,27 +279,28 @@ pub mod count {
 mod test {
     use crate::{
         graphs::{edge_list::EdgeList, test_graphs, FromEdges},
-        util::disjoint_set::{PathCompression, PathHalving, PathSplitting, UndoDisjointSet},
+        util::disjoint_set::{PathCompression, PathHalving, PathSplitting},
     };
 
     const SUCCSESS_RATE: usize = 7;
-
-    #[test]
-    fn karger_stein() {
-        let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
-            super::karger_stein(&mut test_graphs::graph_one::<EdgeList>())
-        });
-        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
-    }
 
     macro_rules! test_fast_karger_stein {
         ($t:ty) => {
             paste::item! {
                 #[test]
                 #[allow(non_snake_case)]
+                fn [<karger_stein_ $t>]() {
+                    let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
+                        super::karger_stein::<_, $t>(&mut test_graphs::graph_one::<EdgeList>())
+                    });
+                    assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+                }
+
+                #[test]
+                #[allow(non_snake_case)]
                 fn [<fast_karger_stein_ $t>]() {
                     let succ = check_min_cut(&test_graphs::GRAPH_ONE_MIN_CUT, || {
-                        super::fast_karger_stein::<_, UndoDisjointSet<$t>>(
+                        super::fast_karger_stein::<_, $t>(
                             &mut test_graphs::graph_one::<EdgeList>(),
                         )
                     });
@@ -318,7 +327,7 @@ mod test {
                         g.push((*a, *b, (), ()))
                     }
                     let succ = check_min_cut(&min_cut, || {
-                        super::fast_karger_stein::<_, UndoDisjointSet<$t>>(
+                        super::fast_karger_stein::<_, $t>(
                             &mut EdgeList::from_edges(20, g.clone())
                         )
                     });
@@ -358,25 +367,26 @@ mod test {
         use super::SUCCSESS_RATE;
         use crate::{
             graphs::{edge_list::EdgeList, test_graphs, FromEdges},
-            util::disjoint_set::{PathCompression, PathHalving, PathSplitting, UndoDisjointSet},
+            util::disjoint_set::{PathCompression, PathHalving, PathSplitting},
         };
-
-        #[test]
-        fn karger_stein() {
-            let succ = check_min_cut(test_graphs::GRAPH_ONE_MIN_CUT.len(), || {
-                karger_stein_count(&mut test_graphs::graph_one::<EdgeList>())
-            });
-            assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
-        }
 
         macro_rules! test_fast_karger_stein {
             ($t:ty) => {
                 paste::item! {
                     #[test]
                     #[allow(non_snake_case)]
+                    fn [<karger_stein_ $t>]() {
+                        let succ = check_min_cut(test_graphs::GRAPH_ONE_MIN_CUT.len(), || {
+                            karger_stein_count::<_, $t>(&mut test_graphs::graph_one::<EdgeList>())
+                        });
+                        assert!(succ > SUCCSESS_RATE, "Got it right {} times", succ)
+                    }
+
+                    #[test]
+                    #[allow(non_snake_case)]
                     fn [<fast_karger_stein_ $t>]() {
                         let succ = check_min_cut(test_graphs::GRAPH_ONE_MIN_CUT.len(), || {
-                            fast_karger_stein_count::<_, UndoDisjointSet<$t>>(
+                            fast_karger_stein_count::<_, $t>(
                                 &mut test_graphs::graph_one::<EdgeList>()
                             )
                         });
@@ -404,7 +414,7 @@ mod test {
                             g.push((*a, *b, (), ()))
                         }
                         let succ = check_min_cut(min_cut.len(), || {
-                            fast_karger_stein_count::<_, UndoDisjointSet<$t>>(
+                            fast_karger_stein_count::<_, $t>(
                                 &mut EdgeList::from_edges(20, g.clone())
                             )
                         });
