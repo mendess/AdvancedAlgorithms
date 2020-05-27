@@ -4,9 +4,8 @@ use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criteri
 use util::*;
 
 pub fn make_params() -> Vec<(usize, usize, usize)> {
-    [1_usize, 5, 9]
-        .iter()
-        .map(|i| i * 100)
+    (1..9)
+        .map(|i| i * 1000)
         .flat_map(|n| [1, 2, 3, 5, 8, 12, 50].iter().map(move |&o| (n, 10, o)))
         .collect::<Vec<_>>()
 }
