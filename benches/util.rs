@@ -10,7 +10,6 @@ pub fn make_rng() -> SmallRng {
 pub fn gen_graph<G>(n: usize, p: f64) -> G
 where
     G: FromEdges,
-    G: Graph<NodeWeight = (), EdgeWeight = ()>,
 {
     G::from_edges(n, random_graph_er(n, p, make_rng()))
 }
@@ -30,6 +29,5 @@ pub fn make_params() -> Vec<(usize, f64, usize)> {
             let g = gen_edge_list(n, p);
             (n, p, g.vertices() + g.edges())
         })
-        .map(|(n, p, e)| (n, p, e))
         .collect::<Vec<_>>()
 }

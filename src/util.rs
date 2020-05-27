@@ -1,6 +1,7 @@
 pub mod disjoint_set;
 pub mod bit_array;
 pub mod random_numbs;
+pub mod hyper_counters;
 
 pub struct ExactSizeIter<I> {
     pub iter: I,

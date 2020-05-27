@@ -1,11 +1,11 @@
 mod util;
 use aava::graphs::{
-    csr::CSR, edge_list::EdgeList, matrix::Adjacency, test_graphs::random_graph_er, Edge, FromEdges,
+    csr::CSR, edge_list::EdgeList, matrix::Adjacency, test_graphs::random_graph_er, FromEdges,
 };
 use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion, Throughput};
 use util::*;
 
-fn gen_edges(n: usize, p: f64) -> (usize, Vec<Edge>) {
+fn gen_edges(n: usize, p: f64) -> (usize, Vec<(usize, usize)>) {
     (n, random_graph_er(n, p, make_rng()))
 }
 

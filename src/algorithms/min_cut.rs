@@ -8,15 +8,13 @@ use rand::{
     thread_rng,
 };
 
-fn contract<N, E, D>(
-    edges: &mut [WEdge<N, E>],
+fn contract<E, D>(
+    edges: &mut [WEdge<E>],
     ds: &mut D,
     comp: usize,
     cur_node: &mut usize,
-) -> Vec<WEdge<N, E>>
+) -> Vec<(usize, usize)>
 where
-    N: Clone,
-    E: Clone,
     D: DisjointSet,
 {
     let mut rng = thread_rng();
@@ -40,21 +38,15 @@ where
         edges
             .iter()
             .filter(|e| !ds.are_connected(e.0, e.1))
-            .cloned()
+            .map(|(f, t, _)| (*f, *t))
             .collect()
     } else {
         Default::default()
     }
 }
 
-fn min_cut<N, E, D>(
-    edges: &mut [WEdge<N, E>],
-    mut ds: D,
-    mut current_node: usize,
-) -> Vec<WEdge<N, E>>
+fn min_cut<E, D>(edges: &mut [WEdge<E>], mut ds: D, mut current_node: usize) -> Vec<(usize, usize)>
 where
-    N: Clone,
-    E: Clone,
     D: DisjointSet + Clone,
 {
     if ds.components() < 6 {
@@ -76,10 +68,8 @@ where
     }
 }
 
-pub fn karger_stein<G, F>(edges: &mut G) -> Vec<WEdge<G::NodeWeight, G::EdgeWeight>>
+pub fn karger_stein<G, F>(edges: &mut G) -> Vec<(usize, usize)>
 where
-    G::NodeWeight: Clone,
-    G::EdgeWeight: Clone,
     G: EdgeListGraph,
     F: FindMode,
     SimpleDisjointSet<F>: DisjointSet + Clone,
@@ -94,14 +84,12 @@ where
         .unwrap()
 }
 
-fn fast_min_cut<N, E, F>(
-    edges: &mut [WEdge<N, E>],
+fn fast_min_cut<E, F>(
+    edges: &mut [WEdge<E>],
     ds: &mut UndoDisjointSet<F>,
     current_node: usize,
-) -> Vec<WEdge<N, E>>
+) -> Vec<(usize, usize)>
 where
-    N: Clone,
-    E: Clone,
     F: FindMode,
     UndoDisjointSet<F>: DisjointSet,
 {
@@ -129,10 +117,8 @@ where
     }
 }
 
-pub fn fast_karger_stein<G, F>(edges: &mut G) -> Vec<WEdge<G::NodeWeight, G::EdgeWeight>>
+pub fn fast_karger_stein<G, F>(edges: &mut G) -> Vec<(usize, usize)>
 where
-    G::NodeWeight: Clone,
-    G::EdgeWeight: Clone,
     G: EdgeListGraph,
     F: FindMode,
     UndoDisjointSet<F>: DisjointSet,
@@ -158,15 +144,13 @@ pub mod count {
         thread_rng,
     };
 
-    fn contract_count<N, E, D>(
-        edges: &mut [WEdge<N, E>],
+    fn contract_count<E, D>(
+        edges: &mut [WEdge<E>],
         ds: &mut D,
         comp: usize,
         cur_node: &mut usize,
     ) -> usize
     where
-        N: Clone,
-        E: Clone,
         D: DisjointSet,
     {
         let mut rng = thread_rng();
@@ -193,10 +177,8 @@ pub mod count {
         }
     }
 
-    fn min_cut_count<N, E, D>(edges: &mut [WEdge<N, E>], mut ds: D, current_node: usize) -> usize
+    fn min_cut_count<E, D>(edges: &mut [WEdge<E>], mut ds: D, current_node: usize) -> usize
     where
-        N: Clone,
-        E: Clone,
         D: DisjointSet + Clone,
     {
         if ds.components() < 6 {
@@ -217,8 +199,6 @@ pub mod count {
 
     pub fn karger_stein_count<G, F>(edges: &mut G) -> usize
     where
-        G::NodeWeight: Clone,
-        G::EdgeWeight: Clone,
         G: EdgeListGraph,
         F: FindMode,
         SimpleDisjointSet<F>: DisjointSet + Clone,
@@ -233,14 +213,12 @@ pub mod count {
             .unwrap()
     }
 
-    fn fast_min_cut_count<N, E, F>(
-        edges: &mut [WEdge<N, E>],
+    fn fast_min_cut_count<E, F>(
+        edges: &mut [WEdge<E>],
         ds: &mut UndoDisjointSet<F>,
         current_node: usize,
     ) -> usize
     where
-        N: Clone,
-        E: Clone,
         F: FindMode,
         UndoDisjointSet<F>: DisjointSet,
     {
@@ -265,8 +243,6 @@ pub mod count {
 
     pub fn fast_karger_stein_count<G, F>(edges: &mut G) -> usize
     where
-        G::NodeWeight: Clone,
-        G::EdgeWeight: Clone,
         G: EdgeListGraph,
         F: FindMode,
         UndoDisjointSet<F>: DisjointSet,
@@ -320,18 +296,18 @@ mod test {
                     for i in 0..10 {
                         for j in 0..10 {
                             if i != j {
-                                g.push((i, j, (), ()));
+                                g.push((i, j));
                             }
                         }
                     }
                     let g0 = g
                         .iter()
-                        .map(|(a, b, _, _)| (a + 10, b + 10, (), ()))
+                        .map(|(a, b)| (a + 10, b + 10))
                         .collect::<Vec<_>>();
                     g.extend(g0);
                     let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
                     for (a, b) in &min_cut {
-                        g.push((*a, *b, (), ()))
+                        g.push((*a, *b, ))
                     }
                     let succ = check_min_cut(&min_cut, || {
                         super::fast_karger_stein::<_, $t>(
@@ -349,19 +325,16 @@ mod test {
     test_fast_karger_stein!(PathSplitting);
 
     #[cfg(test)]
-    fn check_min_cut<F, N, E>(cut: &[(usize, usize)], attempts: F) -> usize
+    fn check_min_cut<F>(cut: &[(usize, usize)], attempts: F) -> usize
     where
-        F: Fn() -> Vec<(usize, usize, N, E)>,
+        F: Fn() -> Vec<(usize, usize)>,
     {
         let mut cut: Vec<_> = cut.to_owned();
         cut.sort();
         (0..10)
             .map(|_| attempts())
             .filter(|attempt| {
-                let mut attempt = attempt
-                    .iter()
-                    .map(|(a, b, _, _)| (*a, *b))
-                    .collect::<Vec<_>>();
+                let mut attempt = attempt.iter().map(|(a, b)| (*a, *b)).collect::<Vec<_>>();
                 attempt.sort();
                 cut == attempt
             })
@@ -407,18 +380,18 @@ mod test {
                         for i in 0..10 {
                             for j in 0..10 {
                                 if i != j {
-                                    g.push((i, j, (), ()));
+                                    g.push((i, j));
                                 }
                             }
                         }
                         let g0 = g
                             .iter()
-                            .map(|(a, b, _, _)| (a + 10, b + 10, (), ()))
+                            .map(|(a, b)| (a + 10, b + 10))
                             .collect::<Vec<_>>();
                         g.extend(g0);
                         let min_cut = [(1, 11), (2, 12), (3, 13), (4, 14)];
                         for (a, b) in &min_cut {
-                            g.push((*a, *b, (), ()))
+                            g.push((*a, *b))
                         }
                         let succ = check_min_cut(min_cut.len(), || {
                             fast_karger_stein_count::<_, $t>(

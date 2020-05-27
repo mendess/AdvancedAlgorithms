@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 itertools = "0.8.x"
-rand = "0.7.x"
+rand = "0.7.3"
 rand_distr = "0.2.x"
 static_assertions = "1.1.x"
 rustc-hash = "1.1.x"
@@ -23,11 +23,15 @@ criterion = "0.3"
 rand = { version = "0.7.x", features = ["small_rng"] }
 
 [[bench]]
-name = "random_graphs"
+name = "apl"
 harness = false
 
 [[bench]]
-name = "min_cut"
+name = "bit_array"
+harness = false
+
+[[bench]]
+name = "cluster_coef"
 harness = false
 
 [[bench]]
@@ -35,10 +39,10 @@ name = "graph_creation"
 harness = false
 
 [[bench]]
-name = "apl"
+name = "min_cut"
 harness = false
 
 [[bench]]
-name = "bit_array"
+name = "random_graphs"
 harness = false
 

@@ -1,25 +1,22 @@
-use super::{Edge,  FromEdges, Graph};
+use super::{To, Graph, WEdge, WFromEdges, WMutable};
 use itertools::Itertools;
 use std::{
-    collections::HashSet,
     fmt::{self, Debug},
     ops::Index,
 };
 
-type Neighbours<N> = HashSet<N>;
+type Neighbours<E> = Vec<To<E>>;
 
 #[derive(Clone)]
-pub struct Adjacency {
-    matrix: Vec<Neighbours<usize>>,
+pub struct Adjacency<E = ()> {
+    matrix: Vec<Neighbours<E>>,
     n_edges: usize,
-    n_vertices: usize,
 }
 
-impl Graph for Adjacency {
-    type NodeWeight = ();
-    type EdgeWeight = ();
+impl<E> Graph for Adjacency<E> {
+    type EdgeWeight = E;
     fn vertices(&self) -> usize {
-        self.n_vertices
+        self.matrix.len()
     }
 
     fn edges(&self) -> usize {
@@ -27,73 +24,75 @@ impl Graph for Adjacency {
     }
 }
 
-impl FromEdges for Adjacency {
+impl<E> WFromEdges for Adjacency<E> {
     fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
-        I: IntoIterator<IntoIter = Iter, Item = Edge>,
-        Iter: ExactSizeIterator<Item = Edge>,
+        I: IntoIterator<IntoIter = Iter, Item = WEdge<E>>,
+        Iter: ExactSizeIterator<Item = WEdge<E>>,
     {
         let edges = list.into_iter();
         let mut s = Self {
-            matrix: Default::default(),
-            n_edges: edges.len(),
-            n_vertices: n,
+            matrix: Vec::with_capacity(n),
+            n_edges: 0,
         };
-        for i in 0..n {
-            s.matrix.insert(i, Default::default());
-        }
-        edges.for_each(|(from, to, (), ())| {
-            s.add_link(from, to);
+        edges.for_each(|(from, to, w)| {
+            s.add_weighed_link(from, to, w);
         });
         s
     }
 }
 
-impl Adjacency {
+impl<E> Adjacency<E> {
     pub fn new() -> Self {
         Self {
             matrix: Default::default(),
             n_edges: 0,
-            n_vertices: 0,
-        }
-    }
-    pub fn add_link(&mut self, from: usize, to: usize) -> bool {
-        match self.matrix.get_mut(from) {
-            Some(neigh) => neigh.insert(to),
-            None => {
-                self.matrix.resize_with(from, Default::default);
-                self.matrix[from].insert(to)
-            }
         }
     }
 
-    pub fn contract(&mut self, (start, end, (), ()): Edge) {
-        let old_neigh = std::mem::replace(&mut self.matrix[end], Default::default());
-        if let Some(neigh) = self.matrix.get_mut(start) {
-            neigh.extend(old_neigh.iter().filter(|&n| *n != start));
-        }
-        for end1 in old_neigh {
-            if let Some(ends) = self.matrix.get_mut(end1) {
-                ends.remove(&end1);
-                ends.insert(start);
-            }
+    pub fn with_capacity(n: usize) -> Self {
+        Self {
+            matrix: Vec::with_capacity(n),
+            n_edges: 0,
         }
     }
 
-    pub fn neighbours(&self, node: usize) -> impl Iterator<Item = &usize> {
+    pub fn neighbours(&self, node: usize) -> impl Iterator<Item = &To<E>> {
         self.matrix[node].iter()
     }
 
-    pub fn neighbourhoods(&self) -> impl Iterator<Item = (usize, impl Iterator<Item = &usize>)> {
+    pub fn neighbourhoods(&self) -> impl Iterator<Item = (usize, impl Iterator<Item = &To<E>>)> {
         self.matrix
             .iter()
             .enumerate()
             .map(|(start, neigh)| (start, neigh.iter()))
     }
+
+    pub fn has_link(&self, from: usize, to: usize) -> bool {
+        self.matrix[from].iter().any(|n| n.to == to)
+    }
+
+    pub fn add_vertex(&mut self, from: usize) {
+        self.matrix.resize_with(from + 1, Default::default);
+    }
 }
 
-impl Index<usize> for Adjacency {
-    type Output = Neighbours<usize>;
+impl<E> WMutable for Adjacency<E> {
+    fn add_weighed_link(&mut self, from: usize, to: usize, weight: E) -> bool {
+        match self.matrix.get_mut(from) {
+            Some(neigh) => neigh.push(To { to, weight }),
+            None => {
+                self.matrix.resize_with(from + 1, Default::default);
+                self.matrix[from].push(To { to, weight });
+            }
+        }
+        self.n_edges += 1;
+        true
+    }
+}
+
+impl<E> Index<usize> for Adjacency<E> {
+    type Output = Neighbours<E>;
     fn index(&self, u: usize) -> &Self::Output {
         &self.matrix[u]
     }

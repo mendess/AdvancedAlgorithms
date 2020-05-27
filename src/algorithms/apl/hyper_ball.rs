@@ -1,7 +1,7 @@
-pub mod hyper_counters;
-
-use crate::graphs::{csr::CSR, *};
-use hyper_counters::HyperLogLogCounter;
+use crate::{
+    graphs::{csr::CSR, *},
+    util::hyper_counters::HyperLogLogCounter,
+};
 
 #[derive(Clone)]
 struct HyperBall<H: HyperLogLogCounter<usize>> {
@@ -19,7 +19,7 @@ impl<H: HyperLogLogCounter<usize> + Clone> HyperBall<H> {
     }
 }
 
-pub fn hyper_ball<F, H>(g: &CSR, f: F) -> f64
+pub fn hyper_ball<F, H, E>(g: &CSR<E>, f: F) -> f64
 where
     H: HyperLogLogCounter<usize> + Clone,
     F: Fn() -> H,
@@ -37,8 +37,8 @@ where
         for (v, successors) in g.neighbourhoods().enumerate() {
             new_counters[v].clone_from(&ball.counters[v]);
             let a = &mut new_counters[v];
-            for &w in successors {
-                modified = bool::max(ball.counters[w].union_onto(a), modified);
+            for w in successors {
+                modified = bool::max(ball.counters[w.to].union_onto(a), modified);
             }
             apls[v] += t as f64 * (a.estimate() - ball.counters[v].estimate());
         }
@@ -53,13 +53,19 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{hyper_counters::*, *};
-    use crate::graphs::{csr::CSR, test_graphs::{GRAPH_ONE_APL, graph_one}};
+    use super::*;
+    use crate::{
+        graphs::{
+            csr::CSR,
+            test_graphs::{graph_one, GRAPH_ONE_APL},
+        },
+        util::hyper_counters::*,
+    };
     const SEED: u64 = 0xBAD5EED;
 
     #[test]
     fn run_normal() {
-        let g = graph_one::<CSR>();
+        let g = graph_one::<CSR<()>>();
         let apl = hyper_ball(&g, || HyperLogLog::new_with_seed(B::B4, SEED));
         eprintln!("APL: {}", apl);
         approx::assert_relative_eq!(apl, GRAPH_ONE_APL, max_relative = 1.0);
@@ -67,7 +73,7 @@ mod tests {
 
     #[test]
     fn run_compact() {
-        let g = graph_one::<CSR>();
+        let g = graph_one::<CSR<()>>();
         let apl = hyper_ball(&g, || {
             CompactHyperLogLog::new_with_seed(B::B4, g.vertices(), SEED)
         });
@@ -77,7 +83,7 @@ mod tests {
 
     #[test]
     fn equivalence() {
-        let g = graph_one::<CSR>();
+        let g = graph_one::<CSR<()>>();
         assert_eq!(
             hyper_ball(&g, || HyperLogLog::new_with_seed(B::B4, SEED)),
             hyper_ball(&g, || CompactHyperLogLog::new_with_seed(

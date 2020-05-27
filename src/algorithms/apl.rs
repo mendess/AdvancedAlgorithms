@@ -1,3 +1,4 @@
+pub mod hyper_ball;
 use crate::graphs::*;
 pub fn apl<G>(g: &G) -> f64
 where

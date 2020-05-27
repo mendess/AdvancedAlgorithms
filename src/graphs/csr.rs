@@ -1,5 +1,4 @@
-// use static_assertions::{assert_not_impl_any, const_assert};
-use super::{Edge, FromEdges, Graph};
+use super::{Graph, To, WEdge, WFromEdges};
 use itertools::Itertools;
 use std::{
     fmt::{self, Debug},
@@ -23,14 +22,13 @@ use std::{
 /// You can do row or column oriented. This is imporant if it's a matrix and not a graph and
 /// multiplication is done.
 #[derive(Default)]
-pub struct CSR {
-    columns: Vec<usize>,
+pub struct CSR<E = ()> {
+    columns: Vec<To<E>>,
     row_indexes: Box<[usize]>,
 }
 
-impl Graph for CSR {
-    type NodeWeight = ();
-    type EdgeWeight = ();
+impl<E> Graph for CSR<E> {
+    type EdgeWeight = E;
     fn vertices(&self) -> usize {
         self.row_indexes.len() - 1
     }
@@ -40,37 +38,40 @@ impl Graph for CSR {
     }
 }
 
-impl FromEdges for CSR {
+impl<E> WFromEdges for CSR<E> {
     /// Create a new CSR
     fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
-        I: IntoIterator<IntoIter = Iter, Item = Edge>,
-        Iter: ExactSizeIterator<Item = Edge>,
+        I: IntoIterator<IntoIter = Iter, Item = WEdge<E>>,
+        Iter: ExactSizeIterator<Item = WEdge<E>>,
     {
         let mut edges = list.into_iter();
         let mut s = Self {
             columns: Vec::with_capacity(edges.len()),
             row_indexes: vec![0; n + 1].into_boxed_slice(),
         };
-        assert!(edges.all(|(from, to, (), ())| { s.add_link(from, to) }));
+        assert!(edges.all(|(from, to, e)| { s.add_weighed_link(from, to, e) }));
         s
     }
 }
 
-impl CSR {
-    pub fn neighbours(&self, i: usize) -> impl Iterator<Item = &usize> {
+impl<E> CSR<E> {
+    pub fn neighbours(&self, i: usize) -> impl Iterator<Item = &To<E>> {
         let from = self.row_indexes[i];
         let to = self.row_indexes[i + 1];
         self.columns[from..to].iter()
     }
 
     /// Add a link to the CSR
-    fn add_link(&mut self, from: usize, to: usize) -> bool {
+    fn add_weighed_link(&mut self, from: usize, to: usize, weight: E) -> bool {
         if from > self.row_indexes.len() {
             return false;
         }
         let start_of_neighbours = self.row_indexes[from];
-        if !self.columns.insert_checked(start_of_neighbours, to) {
+        if !self
+            .columns
+            .insert_checked(start_of_neighbours, To { to, weight })
+        {
             return false;
         }
         self.row_indexes[(from + 1)..]
@@ -80,7 +81,7 @@ impl CSR {
     }
 
     /// Iterate over the neighbours of each edge.
-    pub fn neighbourhoods(&self) -> impl Iterator<Item = &[usize]> {
+    pub fn neighbourhoods(&self) -> impl Iterator<Item = &[To<E>]> {
         self.row_indexes
             .iter()
             .tuple_windows()
@@ -93,8 +94,8 @@ impl CSR {
 }
 
 /// Indexing a graph with a node returns a view of the neighbours of that node.
-impl Index<usize> for CSR {
-    type Output = [usize];
+impl<E> Index<usize> for CSR<E> {
+    type Output = [To<E>];
     fn index(&self, i: usize) -> &Self::Output {
         let from = self.row_indexes[i];
         let to = self.row_indexes[i + 1];
@@ -102,7 +103,10 @@ impl Index<usize> for CSR {
     }
 }
 
-impl Debug for CSR {
+impl<E> Debug for CSR<E>
+where
+    E: Debug,
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.neighbourhoods()
             .enumerate()

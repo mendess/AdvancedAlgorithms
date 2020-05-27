@@ -1,12 +1,11 @@
-use crate::graphs::{EdgeListGraph, FromEdges, Graph, WEdge};
+use crate::graphs::{EdgeListGraph, WFromEdges, Graph, WEdge};
 
-pub struct EdgeList<N = (), E = ()> {
-    edges: Vec<WEdge<N, E>>,
+pub struct EdgeList<E = ()> {
+    edges: Vec<WEdge<E>>,
     n_vertices: usize,
 }
 
-impl<N, E> Graph for EdgeList<N, E> {
-    type NodeWeight = N;
+impl<E> Graph for EdgeList<E> {
     type EdgeWeight = E;
     fn vertices(&self) -> usize {
         self.n_vertices
@@ -17,11 +16,11 @@ impl<N, E> Graph for EdgeList<N, E> {
     }
 }
 
-impl<N, E> FromEdges for EdgeList<N, E> {
+impl<E> WFromEdges for EdgeList<E> {
     fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
-        I: IntoIterator<IntoIter = Iter, Item = WEdge<N, E>>,
-        Iter: ExactSizeIterator<Item = WEdge<N, E>>,
+        I: IntoIterator<IntoIter = Iter, Item = WEdge<E>>,
+        Iter: ExactSizeIterator<Item = WEdge<E>>,
     {
         Self {
             n_vertices: n,
@@ -30,14 +29,14 @@ impl<N, E> FromEdges for EdgeList<N, E> {
     }
 }
 
-impl<N, E> EdgeListGraph for EdgeList<N, E> {
-    type Edges = Vec<WEdge<Self::NodeWeight, Self::EdgeWeight>>;
+impl<E> EdgeListGraph for EdgeList<E> {
+    type Edges = Vec<WEdge<Self::EdgeWeight>>;
 
-    fn as_edges(&self) -> &[WEdge<N, E>] {
+    fn as_edges(&self) -> &[WEdge<E>] {
         &self.edges[..]
     }
 
-    fn as_edges_mut(&mut self) -> &mut [WEdge<N, E>] {
+    fn as_edges_mut(&mut self) -> &mut [WEdge<E>] {
         &mut self.edges[..]
     }
 
@@ -46,23 +45,23 @@ impl<N, E> EdgeListGraph for EdgeList<N, E> {
     }
 }
 
-impl EdgeList<(), ()> {
+impl EdgeList<()> {
     pub fn add_link(&mut self, from: usize, to: usize) -> bool {
         if self.edges.capacity() == self.edges.len() {
             false
         } else {
-            self.edges.push((from, to, (), ()));
+            self.edges.push((from, to, ()));
             true
         }
     }
 }
 
-impl<N, E> EdgeList<N, E> {
-    pub fn add_link_weights(&mut self, from: usize, to: usize, n: N, e: E) -> bool {
+impl<E> EdgeList<E> {
+    pub fn add_link_weights(&mut self, from: usize, to: usize, e: E) -> bool {
         if self.edges.capacity() == self.edges.len() {
             false
         } else {
-            self.edges.push((from, to, n, e));
+            self.edges.push((from, to, e));
             true
         }
     }

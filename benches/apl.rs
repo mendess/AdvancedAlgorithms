@@ -1,11 +1,8 @@
 mod util;
 use aava::{
-    algorithms::apl,
+    algorithms::apl::{self, hyper_ball::hyper_ball},
     graphs::{csr::CSR, edge_list::EdgeList, Graph},
-    hyper_ball::{
-        hyper_ball,
-        hyper_counters::{CompactHyperLogLog, HyperLogLog, B},
-    },
+    util::hyper_counters::*,
 };
 use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion, Throughput};
 use util::*;
