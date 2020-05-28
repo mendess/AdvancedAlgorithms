@@ -1,4 +1,4 @@
-use super::{matrix::Adjacency, FromEdges, Mutable, To};
+use super::{FromEdges, Mutable, RandomAccess, To, WMutable};
 use crate::graph;
 use rand::{
     distributions::{Distribution, Uniform},
@@ -98,13 +98,14 @@ where
     random_graph(n, (dist.sample(&mut rng)).try_into().unwrap(), rng)
 }
 
-pub fn clustered<R>(n: usize, d: usize, o: usize, mut rng: R) -> Adjacency
+pub fn clustered<G, R>(n: usize, d: usize, o: usize, mut rng: R) -> G
 where
     R: Rng,
+    G: WMutable + Mutable + RandomAccess + FromEdges,
 {
     assert!(n > 2);
     assert!(d > 1);
-    let mut g = graph![Adjacency = (n) { 0 => 1 }];
+    let mut g = graph![G = (n) { 0 => 1 }];
     let mut vertices = Vec::with_capacity(n);
     vertices.push(0);
     vertices.push(1);
@@ -113,7 +114,9 @@ where
         g.add_vertex(v);
         for _ in 0..usize::min(v, d) {
             let u = loop {
-                let u = *vertices.choose_weighted(&mut rng, |&i| g[i].len()).unwrap();
+                let u = *vertices
+                    .choose_weighted(&mut rng, |&i| g.neighbours(i).len())
+                    .unwrap();
                 if !g.has_link(v, u) {
                     break u;
                 }
@@ -121,10 +124,11 @@ where
             g.add_link(v, u);
         }
         for _ in 0..o {
-            let (&u, &w) = g[v]
+            let (&u, &w) = g
+                .neighbours(v)
                 .choose(&mut rng)
                 .and_then(|To { to: u, .. }| loop {
-                    let w = &g[v].choose(&mut rng).unwrap().to;
+                    let w = &g.neighbours(v).choose(&mut rng).unwrap().to;
                     if u != w {
                         break Some((u, w));
                     }

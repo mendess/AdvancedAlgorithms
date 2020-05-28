@@ -1,4 +1,4 @@
-use super::{To, Graph, WEdge, WFromEdges, WMutable};
+use super::{Graph, To, WEdge, WFromEdges, WMutable};
 use itertools::Itertools;
 use std::{
     fmt::{self, Debug},
@@ -57,23 +57,11 @@ impl<E> Adjacency<E> {
         }
     }
 
-    pub fn neighbours(&self, node: usize) -> impl Iterator<Item = &To<E>> {
-        self.matrix[node].iter()
-    }
-
     pub fn neighbourhoods(&self) -> impl Iterator<Item = (usize, impl Iterator<Item = &To<E>>)> {
         self.matrix
             .iter()
             .enumerate()
             .map(|(start, neigh)| (start, neigh.iter()))
-    }
-
-    pub fn has_link(&self, from: usize, to: usize) -> bool {
-        self.matrix[from].iter().any(|n| n.to == to)
-    }
-
-    pub fn add_vertex(&mut self, from: usize) {
-        self.matrix.resize_with(from + 1, Default::default);
     }
 }
 
@@ -89,10 +77,14 @@ impl<E> WMutable for Adjacency<E> {
         self.n_edges += 1;
         true
     }
+
+    fn add_vertex(&mut self, from: usize) {
+        self.matrix.resize_with(from + 1, Default::default);
+    }
 }
 
 impl<E> Index<usize> for Adjacency<E> {
-    type Output = Neighbours<E>;
+    type Output = [To<E>];
     fn index(&self, u: usize) -> &Self::Output {
         &self.matrix[u]
     }

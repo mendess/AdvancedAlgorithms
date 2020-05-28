@@ -2,7 +2,7 @@
 pub mod algorithms;
 pub mod graphs;
 pub mod util;
-use graphs::{csr::CSR, FromEdges};
+use graphs::{csr::CSR, matrix::Adjacency, test_graphs::clustered, FromEdges};
 use util::ToExactSizeIter;
 
 pub fn main() {
@@ -18,13 +18,7 @@ pub fn main() {
     let graphs = (2..9)
         .map(|i| i * 100000)
         .flat_map(|i| [1, 2, 3, 5, 8, 12, 50].iter().copied().map(move |o| (i, o)))
-        .map(|(n, o)| {
-            (
-                n,
-                o,
-                graphs::test_graphs::clustered(n, d, o, rand::thread_rng()),
-            )
-        })
+        .map(|(n, o)| (n, o, clustered::<Adjacency, _>(n, d, o, rand::thread_rng())))
         .inspect(|(n, o, _)| eprintln!("Built g {{ n: {}, d: {}, o: {} }}", n, d, o));
     for (n, o, g) in graphs {
         eprintln!(

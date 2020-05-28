@@ -28,8 +28,7 @@ pub trait WFromEdges: Graph {
 
 impl<G> FromEdges for G
 where
-    G: WFromEdges,
-    G: Graph<EdgeWeight = ()>,
+    G: WFromEdges + Graph<EdgeWeight = ()>,
 {
     fn from_edges<I, Iter>(n: usize, list: I) -> Self
     where
@@ -54,17 +53,38 @@ pub trait Mutable: Graph<EdgeWeight = ()> {
 
 pub trait WMutable: Graph {
     fn add_weighed_link(&mut self, from: usize, to: usize, w: Self::EdgeWeight) -> bool;
+    fn add_vertex(&mut self, v: usize);
 }
 
 impl<G> Mutable for G
 where
-    G: WMutable,
-    G: Graph<EdgeWeight = ()>,
+    G: WMutable + Graph<EdgeWeight = ()>,
 {
     fn add_link(&mut self, from: usize, to: usize) -> bool {
         self.add_weighed_link(from, to, ())
     }
 }
+
+pub trait RandomAccess: Graph {
+    /// Returns the vertices of the graph connected to `from`
+    fn neighbours(&self, from: usize) -> &[To<Self::EdgeWeight>];
+    /// Checks if two vertices are connected
+    fn has_link(&self, from: usize, to: usize) -> bool;
+}
+
+impl<T> RandomAccess for T
+where
+    T: Graph + std::ops::Index<usize, Output = [To<Self::EdgeWeight>]>,
+{
+    fn neighbours(&self, from: usize) -> &[To<Self::EdgeWeight>] {
+        &self[from]
+    }
+
+    fn has_link(&self, from: usize, to: usize) -> bool {
+        self[from].iter().any(|n| n.to == to)
+    }
+}
+
 
 impl<'g, G> Graph for &'g G
 where
