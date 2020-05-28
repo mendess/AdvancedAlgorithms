@@ -44,6 +44,34 @@ pub fn bench(c: &mut Criterion) {
     group.finish();
 }
 
+pub fn apl(c: &mut Criterion) {
+    let mut group = c.benchmark_group("Clustering Coef Adj Only");
+    for ((adj, _, node_indexes), d, o) in make_params() {
+        let n = adj.vertices() + adj.edges();
+        group.throughput(Throughput::Elements(n as u64));
+        group.bench_with_input(
+            BenchmarkId::from_parameter(format!("{}_{}_{}", n, d, o)),
+            &(node_indexes, adj),
+            |b, (n, g)| b.iter(|| c_coef(20, n, g, make_rng())),
+        );
+    }
+    group.finish();
+}
+
+pub fn csr(c: &mut Criterion) {
+    let mut group = c.benchmark_group("Clustering Coef CSR Only");
+    for ((_, csr, node_indexes), d, o) in make_params() {
+        let n = csr.vertices() + csr.edges();
+        group.throughput(Throughput::Elements(n as u64));
+        group.bench_with_input(
+            BenchmarkId::from_parameter(format!("{}_{}_{}", n, d, o)),
+            &(node_indexes, csr),
+            |b, (n, g)| b.iter(|| c_coef(20, n, g, make_rng())),
+        );
+    }
+    group.finish();
+}
+
 criterion_group! {
     name = benches;
     config = Criterion::default().sample_size(30);
