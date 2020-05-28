@@ -98,17 +98,17 @@ where
         contract(edges, ds, 2, &mut cur)
     } else {
         let t = 1 + (ds.components() as f64 / 2.0_f64.sqrt()) as usize;
-        let mut updateable_node = current_node;
+        let mut current_node_copy = current_node;
         ds.save_state();
-        contract(edges, ds, t, &mut updateable_node);
-        let m1 = fast_min_cut(edges, ds, updateable_node);
+        contract(edges, ds, t, &mut current_node_copy);
+        let m1 = fast_min_cut(edges, ds, current_node_copy);
         ds.restore_state();
 
-        ds.save_state();
-        updateable_node = current_node;
-        contract(edges, ds, t, &mut updateable_node);
-        let m2 = fast_min_cut(edges, ds, updateable_node);
-        ds.restore_state();
+        // ds.save_state();
+        current_node_copy = current_node;
+        contract(edges, ds, t, &mut current_node_copy);
+        let m2 = fast_min_cut(edges, ds, current_node_copy);
+        // ds.restore_state();
         if m1.len() < m2.len() {
             m1
         } else {
