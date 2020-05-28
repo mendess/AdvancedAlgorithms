@@ -1,5 +1,8 @@
 mod util;
-use aava::{algorithms::clustering_coef::c_coef, graphs::test_graphs::clustered};
+use aava::{
+    algorithms::clustering_coef::c_coef,
+    graphs::{test_graphs::clustered, Graph},
+};
 use criterion::{criterion_group, criterion_main, BatchSize, BenchmarkId, Criterion, Throughput};
 use util::*;
 
@@ -7,6 +10,10 @@ pub fn make_params() -> Vec<(usize, usize, usize)> {
     (1..9)
         .map(|i| i * 1000)
         .flat_map(|n| [1, 2, 3, 5, 8, 12, 50].iter().map(move |&o| (n, 10, o)))
+        .map(|(n, d, o)| {
+            let g = clustered(n, d, o, make_rng());
+            (g.vertices() + g.edges(), d, o)
+        })
         .collect::<Vec<_>>()
 }
 
