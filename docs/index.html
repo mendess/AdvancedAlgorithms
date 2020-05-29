@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Index - Criterion.rs</title>
+    <style type="text/css">
+        body {
+            font: 14px Helvetica Neue;
+            text-rendering: optimizelegibility;
+        }
+
+        .body {
+            width: 960px;
+            margin: auto;
+        }
+
+        a:link {
+            color: #1F78B4;
+            text-decoration: none;
+        }
+
+        h2 {
+            font-size: 36px;
+            font-weight: 300;
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 300;
+        }
+
+        #footer {
+            height: 40px;
+            background: #888;
+            color: white;
+            font-size: larger;
+            font-weight: 300;
+        }
+
+        #footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        #footer p {
+            text-align: center
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="body">
+        <h2>Criterion.rs Benchmark Index</h2>
+        See individual benchmark pages below for more details.
+        <ul>
+            <li><a href="APL/report/index.html">APL</a></li>
+
+            <ul>
+                <li>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th><a href="APL/apl/report/index.html">apl</a></th>
+                            <th><a href="APL/compact_hyperLogLog/report/index.html">compact_hyperLogLog</a></th>
+                            <th><a href="APL/hyperLogLog/report/index.html">hyperLogLog</a></th>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/20_0.6_132/report/index.html">20_0.6_132</a></th>
+                            <td><a href="APL/apl/20_0.6_132/report/index.html">APL/apl/20_0.6_132</a></td>
+                            <td><a href="APL/compact_hyperLogLog/20_0.6_132/report/index.html">APL/compact_hyperLogLog/20_0.6_132</a></td>
+                            <td><a href="APL/hyperLogLog/20_0.6_132/report/index.html">APL/hyperLogLog/20_0.6_132</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/30_0.4_215/report/index.html">30_0.4_215</a></th>
+                            <td><a href="APL/apl/30_0.4_215/report/index.html">APL/apl/30_0.4_215</a></td>
+                            <td><a href="APL/compact_hyperLogLog/30_0.4_215/report/index.html">APL/compact_hyperLogLog/30_0.4_215</a></td>
+                            <td><a href="APL/hyperLogLog/30_0.4_215/report/index.html">APL/hyperLogLog/30_0.4_215</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/30_0.8_386/report/index.html">30_0.8_386</a></th>
+                            <td><a href="APL/apl/30_0.8_386/report/index.html">APL/apl/30_0.8_386</a></td>
+                            <td><a href="APL/compact_hyperLogLog/30_0.8_386/report/index.html">APL/compact_hyperLogLog/30_0.8_386</a></td>
+                            <td><a href="APL/hyperLogLog/30_0.8_386/report/index.html">APL/hyperLogLog/30_0.8_386</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/40_0.6_494/report/index.html">40_0.6_494</a></th>
+                            <td><a href="APL/apl/40_0.6_494/report/index.html">APL/apl/40_0.6_494</a></td>
+                            <td><a href="APL/compact_hyperLogLog/40_0.6_494/report/index.html">APL/compact_hyperLogLog/40_0.6_494</a></td>
+                            <td><a href="APL/hyperLogLog/40_0.6_494/report/index.html">APL/hyperLogLog/40_0.6_494</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/40_0.8_684/report/index.html">40_0.8_684</a></th>
+                            <td><a href="APL/apl/40_0.8_684/report/index.html">APL/apl/40_0.8_684</a></td>
+                            <td><a href="APL/compact_hyperLogLog/40_0.8_684/report/index.html">APL/compact_hyperLogLog/40_0.8_684</a></td>
+                            <td><a href="APL/hyperLogLog/40_0.8_684/report/index.html">APL/hyperLogLog/40_0.8_684</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/50_0.6_769/report/index.html">50_0.6_769</a></th>
+                            <td><a href="APL/apl/50_0.6_769/report/index.html">APL/apl/50_0.6_769</a></td>
+                            <td><a href="APL/compact_hyperLogLog/50_0.6_769/report/index.html">APL/compact_hyperLogLog/50_0.6_769</a></td>
+                            <td><a href="APL/hyperLogLog/50_0.6_769/report/index.html">APL/hyperLogLog/50_0.6_769</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/50_0.8_1015/report/index.html">50_0.8_1015</a></th>
+                            <td><a href="APL/apl/50_0.8_1015/report/index.html">APL/apl/50_0.8_1015</a></td>
+                            <td><a href="APL/compact_hyperLogLog/50_0.8_1015/report/index.html">APL/compact_hyperLogLog/50_0.8_1015</a></td>
+                            <td><a href="APL/hyperLogLog/50_0.8_1015/report/index.html">APL/hyperLogLog/50_0.8_1015</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/60_0.6_1103/report/index.html">60_0.6_1103</a></th>
+                            <td><a href="APL/apl/60_0.6_1103/report/index.html">APL/apl/60_0.6_1103</a></td>
+                            <td><a href="APL/compact_hyperLogLog/60_0.6_1103/report/index.html">APL/compact_hyperLogLog/60_0.6_1103</a></td>
+                            <td><a href="APL/hyperLogLog/60_0.6_1103/report/index.html">APL/hyperLogLog/60_0.6_1103</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/60_0.8_1460/report/index.html">60_0.8_1460</a></th>
+                            <td><a href="APL/apl/60_0.8_1460/report/index.html">APL/apl/60_0.8_1460</a></td>
+                            <td><a href="APL/compact_hyperLogLog/60_0.8_1460/report/index.html">APL/compact_hyperLogLog/60_0.8_1460</a></td>
+                            <td><a href="APL/hyperLogLog/60_0.8_1460/report/index.html">APL/hyperLogLog/60_0.8_1460</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/70_0.2_572/report/index.html">70_0.2_572</a></th>
+                            <td><a href="APL/apl/70_0.2_572/report/index.html">APL/apl/70_0.2_572</a></td>
+                            <td><a href="APL/compact_hyperLogLog/70_0.2_572/report/index.html">APL/compact_hyperLogLog/70_0.2_572</a></td>
+                            <td><a href="APL/hyperLogLog/70_0.2_572/report/index.html">APL/hyperLogLog/70_0.2_572</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/70_0.6_1497/report/index.html">70_0.6_1497</a></th>
+                            <td><a href="APL/apl/70_0.6_1497/report/index.html">APL/apl/70_0.6_1497</a></td>
+                            <td><a href="APL/compact_hyperLogLog/70_0.6_1497/report/index.html">APL/compact_hyperLogLog/70_0.6_1497</a></td>
+                            <td><a href="APL/hyperLogLog/70_0.6_1497/report/index.html">APL/hyperLogLog/70_0.6_1497</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/70_0.8_1983/report/index.html">70_0.8_1983</a></th>
+                            <td><a href="APL/apl/70_0.8_1983/report/index.html">APL/apl/70_0.8_1983</a></td>
+                            <td><a href="APL/compact_hyperLogLog/70_0.8_1983/report/index.html">APL/compact_hyperLogLog/70_0.8_1983</a></td>
+                            <td><a href="APL/hyperLogLog/70_0.8_1983/report/index.html">APL/hyperLogLog/70_0.8_1983</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="APL/80_0.8_2587/report/index.html">80_0.8_2587</a></th>
+                            <td><a href="APL/apl/80_0.8_2587/report/index.html">APL/apl/80_0.8_2587</a></td>
+                            <td><a href="APL/compact_hyperLogLog/80_0.8_2587/report/index.html">APL/compact_hyperLogLog/80_0.8_2587</a></td>
+                            <td><a href="APL/hyperLogLog/80_0.8_2587/report/index.html">APL/hyperLogLog/80_0.8_2587</a></td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+            <li><a href="Clustering Coef/report/index.html">Clustering Coef</a></li>
+
+            <ul>
+                <li>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th><a href="Clustering Coef/adj/report/index.html">adj</a></th>
+                            <th><a href="Clustering Coef/csr/report/index.html">csr</a></th>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/10002_10_12/report/index.html">10002_10_12</a></th>
+                            <td><a href="Clustering Coef/adj/10002_10_12/report/index.html">Clustering Coef/adj/10002_10_12</a></td>
+                            <td><a href="Clustering Coef/csr/10002_10_12/report/index.html">Clustering Coef/csr/10002_10_12</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/100908_10_50/report/index.html">100908_10_50</a></th>
+                            <td><a href="Clustering Coef/adj/100908_10_50/report/index.html">Clustering Coef/adj/100908_10_50</a></td>
+                            <td><a href="Clustering Coef/csr/100908_10_50/report/index.html">Clustering Coef/csr/100908_10_50</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/11887_10_1/report/index.html">11887_10_1</a></th>
+                            <td><a href="Clustering Coef/adj/11887_10_1/report/index.html">Clustering Coef/adj/11887_10_1</a></td>
+                            <td><a href="Clustering Coef/csr/11887_10_1/report/index.html">Clustering Coef/csr/11887_10_1</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/122441_10_50/report/index.html">122441_10_50</a></th>
+                            <td><a href="Clustering Coef/adj/122441_10_50/report/index.html">Clustering Coef/adj/122441_10_50</a></td>
+                            <td><a href="Clustering Coef/csr/122441_10_50/report/index.html">Clustering Coef/csr/122441_10_50</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/12826_10_2/report/index.html">12826_10_2</a></th>
+                            <td><a href="Clustering Coef/adj/12826_10_2/report/index.html">Clustering Coef/adj/12826_10_2</a></td>
+                            <td><a href="Clustering Coef/csr/12826_10_2/report/index.html">Clustering Coef/csr/12826_10_2</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/13709_10_3/report/index.html">13709_10_3</a></th>
+                            <td><a href="Clustering Coef/adj/13709_10_3/report/index.html">Clustering Coef/adj/13709_10_3</a></td>
+                            <td><a href="Clustering Coef/csr/13709_10_3/report/index.html">Clustering Coef/csr/13709_10_3</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/144373_10_50/report/index.html">144373_10_50</a></th>
+                            <td><a href="Clustering Coef/adj/144373_10_50/report/index.html">Clustering Coef/adj/144373_10_50</a></td>
+                            <td><a href="Clustering Coef/csr/144373_10_50/report/index.html">Clustering Coef/csr/144373_10_50</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/15412_10_5/report/index.html">15412_10_5</a></th>
+                            <td><a href="Clustering Coef/adj/15412_10_5/report/index.html">Clustering Coef/adj/15412_10_5</a></td>
+                            <td><a href="Clustering Coef/csr/15412_10_5/report/index.html">Clustering Coef/csr/15412_10_5</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/166300_10_50/report/index.html">166300_10_50</a></th>
+                            <td><a href="Clustering Coef/adj/166300_10_50/report/index.html">Clustering Coef/adj/166300_10_50</a></td>
+                            <td><a href="Clustering Coef/csr/166300_10_50/report/index.html">Clustering Coef/csr/166300_10_50</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/17318_10_50/report/index.html">17318_10_50</a></th>
+                            <td><a href="Clustering Coef/adj/17318_10_50/report/index.html">Clustering Coef/adj/17318_10_50</a></td>
+                            <td><a href="Clustering Coef/csr/17318_10_50/report/index.html">Clustering Coef/csr/17318_10_50</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/17819_10_8/report/index.html">17819_10_8</a></th>
+                            <td><a href="Clustering Coef/adj/17819_10_8/report/index.html">Clustering Coef/adj/17819_10_8</a></td>
+                            <td><a href="Clustering Coef/csr/17819_10_8/report/index.html">Clustering Coef/csr/17819_10_8</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/17877_10_1/report/index.html">17877_10_1</a></th>
+                            <td><a href="Clustering Coef/adj/17877_10_1/report/index.html">Clustering Coef/adj/17877_10_1</a></td>
+                            <td><a href="Clustering Coef/csr/17877_10_1/report/index.html">Clustering Coef/csr/17877_10_1</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/19305_10_2/report/index.html">19305_10_2</a></th>
+                            <td><a href="Clustering Coef/adj/19305_10_2/report/index.html">Clustering Coef/adj/19305_10_2</a></td>
+                            <td><a href="Clustering Coef/csr/19305_10_2/report/index.html">Clustering Coef/csr/19305_10_2</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/20670_10_3/report/index.html">20670_10_3</a></th>
+                            <td><a href="Clustering Coef/adj/20670_10_3/report/index.html">Clustering Coef/adj/20670_10_3</a></td>
+                            <td><a href="Clustering Coef/csr/20670_10_3/report/index.html">Clustering Coef/csr/20670_10_3</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/20703_10_12/report/index.html">20703_10_12</a></th>
+                            <td><a href="Clustering Coef/adj/20703_10_12/report/index.html">Clustering Coef/adj/20703_10_12</a></td>
+                            <td><a href="Clustering Coef/csr/20703_10_12/report/index.html">Clustering Coef/csr/20703_10_12</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/23305_10_5/report/index.html">23305_10_5</a></th>
+                            <td><a href="Clustering Coef/adj/23305_10_5/report/index.html">Clustering Coef/adj/23305_10_5</a></td>
+                            <td><a href="Clustering Coef/csr/23305_10_5/report/index.html">Clustering Coef/csr/23305_10_5</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/23872_10_1/report/index.html">23872_10_1</a></th>
+                            <td><a href="Clustering Coef/adj/23872_10_1/report/index.html">Clustering Coef/adj/23872_10_1</a></td>
+                            <td><a href="Clustering Coef/csr/23872_10_1/report/index.html">Clustering Coef/csr/23872_10_1</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/25792_10_2/report/index.html">25792_10_2</a></th>
+                            <td><a href="Clustering Coef/adj/25792_10_2/report/index.html">Clustering Coef/adj/25792_10_2</a></td>
+                            <td><a href="Clustering Coef/csr/25792_10_2/report/index.html">Clustering Coef/csr/25792_10_2</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/27047_10_8/report/index.html">27047_10_8</a></th>
+                            <td><a href="Clustering Coef/adj/27047_10_8/report/index.html">Clustering Coef/adj/27047_10_8</a></td>
+                            <td><a href="Clustering Coef/csr/27047_10_8/report/index.html">Clustering Coef/csr/27047_10_8</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/27633_10_3/report/index.html">27633_10_3</a></th>
+                            <td><a href="Clustering Coef/adj/27633_10_3/report/index.html">Clustering Coef/adj/27633_10_3</a></td>
+                            <td><a href="Clustering Coef/csr/27633_10_3/report/index.html">Clustering Coef/csr/27633_10_3</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/29871_10_1/report/index.html">29871_10_1</a></th>
+                            <td><a href="Clustering Coef/adj/29871_10_1/report/index.html">Clustering Coef/adj/29871_10_1</a></td>
+                            <td><a href="Clustering Coef/csr/29871_10_1/report/index.html">Clustering Coef/csr/29871_10_1</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/31223_10_5/report/index.html">31223_10_5</a></th>
+                            <td><a href="Clustering Coef/adj/31223_10_5/report/index.html">Clustering Coef/adj/31223_10_5</a></td>
+                            <td><a href="Clustering Coef/csr/31223_10_5/report/index.html">Clustering Coef/csr/31223_10_5</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/31504_10_12/report/index.html">31504_10_12</a></th>
+                            <td><a href="Clustering Coef/adj/31504_10_12/report/index.html">Clustering Coef/adj/31504_10_12</a></td>
+                            <td><a href="Clustering Coef/csr/31504_10_12/report/index.html">Clustering Coef/csr/31504_10_12</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/32280_10_2/report/index.html">32280_10_2</a></th>
+                            <td><a href="Clustering Coef/adj/32280_10_2/report/index.html">Clustering Coef/adj/32280_10_2</a></td>
+                            <td><a href="Clustering Coef/csr/32280_10_2/report/index.html">Clustering Coef/csr/32280_10_2</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/34600_10_3/report/index.html">34600_10_3</a></th>
+                            <td><a href="Clustering Coef/adj/34600_10_3/report/index.html">Clustering Coef/adj/34600_10_3</a></td>
+                            <td><a href="Clustering Coef/csr/34600_10_3/report/index.html">Clustering Coef/csr/34600_10_3</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/35869_10_1/report/index.html">35869_10_1</a></th>
+                            <td><a href="Clustering Coef/adj/35869_10_1/report/index.html">Clustering Coef/adj/35869_10_1</a></td>
+                            <td><a href="Clustering Coef/csr/35869_10_1/report/index.html">Clustering Coef/csr/35869_10_1</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/36268_10_8/report/index.html">36268_10_8</a></th>
+                            <td><a href="Clustering Coef/adj/36268_10_8/report/index.html">Clustering Coef/adj/36268_10_8</a></td>
+                            <td><a href="Clustering Coef/csr/36268_10_8/report/index.html">Clustering Coef/csr/36268_10_8</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/37437_10_50/report/index.html">37437_10_50</a></th>
+                            <td><a href="Clustering Coef/adj/37437_10_50/report/index.html">Clustering Coef/adj/37437_10_50</a></td>
+                            <td><a href="Clustering Coef/csr/37437_10_50/report/index.html">Clustering Coef/csr/37437_10_50</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/38769_10_2/report/index.html">38769_10_2</a></th>
+                            <td><a href="Clustering Coef/adj/38769_10_2/report/index.html">Clustering Coef/adj/38769_10_2</a></td>
+                            <td><a href="Clustering Coef/csr/38769_10_2/report/index.html">Clustering Coef/csr/38769_10_2</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/39130_10_5/report/index.html">39130_10_5</a></th>
+                            <td><a href="Clustering Coef/adj/39130_10_5/report/index.html">Clustering Coef/adj/39130_10_5</a></td>
+                            <td><a href="Clustering Coef/csr/39130_10_5/report/index.html">Clustering Coef/csr/39130_10_5</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/41572_10_3/report/index.html">41572_10_3</a></th>
+                            <td><a href="Clustering Coef/adj/41572_10_3/report/index.html">Clustering Coef/adj/41572_10_3</a></td>
+                            <td><a href="Clustering Coef/csr/41572_10_3/report/index.html">Clustering Coef/csr/41572_10_3</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/41868_10_1/report/index.html">41868_10_1</a></th>
+                            <td><a href="Clustering Coef/adj/41868_10_1/report/index.html">Clustering Coef/adj/41868_10_1</a></td>
+                            <td><a href="Clustering Coef/csr/41868_10_1/report/index.html">Clustering Coef/csr/41868_10_1</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/42390_10_12/report/index.html">42390_10_12</a></th>
+                            <td><a href="Clustering Coef/adj/42390_10_12/report/index.html">Clustering Coef/adj/42390_10_12</a></td>
+                            <td><a href="Clustering Coef/csr/42390_10_12/report/index.html">Clustering Coef/csr/42390_10_12</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/45257_10_2/report/index.html">45257_10_2</a></th>
+                            <td><a href="Clustering Coef/adj/45257_10_2/report/index.html">Clustering Coef/adj/45257_10_2</a></td>
+                            <td><a href="Clustering Coef/csr/45257_10_2/report/index.html">Clustering Coef/csr/45257_10_2</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/45522_10_8/report/index.html">45522_10_8</a></th>
+                            <td><a href="Clustering Coef/adj/45522_10_8/report/index.html">Clustering Coef/adj/45522_10_8</a></td>
+                            <td><a href="Clustering Coef/csr/45522_10_8/report/index.html">Clustering Coef/csr/45522_10_8</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/47022_10_5/report/index.html">47022_10_5</a></th>
+                            <td><a href="Clustering Coef/adj/47022_10_5/report/index.html">Clustering Coef/adj/47022_10_5</a></td>
+                            <td><a href="Clustering Coef/csr/47022_10_5/report/index.html">Clustering Coef/csr/47022_10_5</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/47868_10_1/report/index.html">47868_10_1</a></th>
+                            <td><a href="Clustering Coef/adj/47868_10_1/report/index.html">Clustering Coef/adj/47868_10_1</a></td>
+                            <td><a href="Clustering Coef/csr/47868_10_1/report/index.html">Clustering Coef/csr/47868_10_1</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/48546_10_3/report/index.html">48546_10_3</a></th>
+                            <td><a href="Clustering Coef/adj/48546_10_3/report/index.html">Clustering Coef/adj/48546_10_3</a></td>
+                            <td><a href="Clustering Coef/csr/48546_10_3/report/index.html">Clustering Coef/csr/48546_10_3</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/51748_10_2/report/index.html">51748_10_2</a></th>
+                            <td><a href="Clustering Coef/adj/51748_10_2/report/index.html">Clustering Coef/adj/51748_10_2</a></td>
+                            <td><a href="Clustering Coef/csr/51748_10_2/report/index.html">Clustering Coef/csr/51748_10_2</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/53296_10_12/report/index.html">53296_10_12</a></th>
+                            <td><a href="Clustering Coef/adj/53296_10_12/report/index.html">Clustering Coef/adj/53296_10_12</a></td>
+                            <td><a href="Clustering Coef/csr/53296_10_12/report/index.html">Clustering Coef/csr/53296_10_12</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/54811_10_8/report/index.html">54811_10_8</a></th>
+                            <td><a href="Clustering Coef/adj/54811_10_8/report/index.html">Clustering Coef/adj/54811_10_8</a></td>
+                            <td><a href="Clustering Coef/csr/54811_10_8/report/index.html">Clustering Coef/csr/54811_10_8</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/54933_10_5/report/index.html">54933_10_5</a></th>
+                            <td><a href="Clustering Coef/adj/54933_10_5/report/index.html">Clustering Coef/adj/54933_10_5</a></td>
+                            <td><a href="Clustering Coef/csr/54933_10_5/report/index.html">Clustering Coef/csr/54933_10_5</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/55522_10_3/report/index.html">55522_10_3</a></th>
+                            <td><a href="Clustering Coef/adj/55522_10_3/report/index.html">Clustering Coef/adj/55522_10_3</a></td>
+                            <td><a href="Clustering Coef/csr/55522_10_3/report/index.html">Clustering Coef/csr/55522_10_3</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/58251_10_50/report/index.html">58251_10_50</a></th>
+                            <td><a href="Clustering Coef/adj/58251_10_50/report/index.html">Clustering Coef/adj/58251_10_50</a></td>
+                            <td><a href="Clustering Coef/csr/58251_10_50/report/index.html">Clustering Coef/csr/58251_10_50</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/5900_10_1/report/index.html">5900_10_1</a></th>
+                            <td><a href="Clustering Coef/adj/5900_10_1/report/index.html">Clustering Coef/adj/5900_10_1</a></td>
+                            <td><a href="Clustering Coef/csr/5900_10_1/report/index.html">Clustering Coef/csr/5900_10_1</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/62840_10_5/report/index.html">62840_10_5</a></th>
+                            <td><a href="Clustering Coef/adj/62840_10_5/report/index.html">Clustering Coef/adj/62840_10_5</a></td>
+                            <td><a href="Clustering Coef/csr/62840_10_5/report/index.html">Clustering Coef/csr/62840_10_5</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/6361_10_2/report/index.html">6361_10_2</a></th>
+                            <td><a href="Clustering Coef/adj/6361_10_2/report/index.html">Clustering Coef/adj/6361_10_2</a></td>
+                            <td><a href="Clustering Coef/csr/6361_10_2/report/index.html">Clustering Coef/csr/6361_10_2</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/64100_10_8/report/index.html">64100_10_8</a></th>
+                            <td><a href="Clustering Coef/adj/64100_10_8/report/index.html">Clustering Coef/adj/64100_10_8</a></td>
+                            <td><a href="Clustering Coef/csr/64100_10_8/report/index.html">Clustering Coef/csr/64100_10_8</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/64227_10_12/report/index.html">64227_10_12</a></th>
+                            <td><a href="Clustering Coef/adj/64227_10_12/report/index.html">Clustering Coef/adj/64227_10_12</a></td>
+                            <td><a href="Clustering Coef/csr/64227_10_12/report/index.html">Clustering Coef/csr/64227_10_12</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/6766_10_3/report/index.html">6766_10_3</a></th>
+                            <td><a href="Clustering Coef/adj/6766_10_3/report/index.html">Clustering Coef/adj/6766_10_3</a></td>
+                            <td><a href="Clustering Coef/csr/6766_10_3/report/index.html">Clustering Coef/csr/6766_10_3</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/73397_10_8/report/index.html">73397_10_8</a></th>
+                            <td><a href="Clustering Coef/adj/73397_10_8/report/index.html">Clustering Coef/adj/73397_10_8</a></td>
+                            <td><a href="Clustering Coef/csr/73397_10_8/report/index.html">Clustering Coef/csr/73397_10_8</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/75177_10_12/report/index.html">75177_10_12</a></th>
+                            <td><a href="Clustering Coef/adj/75177_10_12/report/index.html">Clustering Coef/adj/75177_10_12</a></td>
+                            <td><a href="Clustering Coef/csr/75177_10_12/report/index.html">Clustering Coef/csr/75177_10_12</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/7546_10_5/report/index.html">7546_10_5</a></th>
+                            <td><a href="Clustering Coef/adj/7546_10_5/report/index.html">Clustering Coef/adj/7546_10_5</a></td>
+                            <td><a href="Clustering Coef/csr/7546_10_5/report/index.html">Clustering Coef/csr/7546_10_5</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/79416_10_50/report/index.html">79416_10_50</a></th>
+                            <td><a href="Clustering Coef/adj/79416_10_50/report/index.html">Clustering Coef/adj/79416_10_50</a></td>
+                            <td><a href="Clustering Coef/csr/79416_10_50/report/index.html">Clustering Coef/csr/79416_10_50</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/86171_10_12/report/index.html">86171_10_12</a></th>
+                            <td><a href="Clustering Coef/adj/86171_10_12/report/index.html">Clustering Coef/adj/86171_10_12</a></td>
+                            <td><a href="Clustering Coef/csr/86171_10_12/report/index.html">Clustering Coef/csr/86171_10_12</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="Clustering Coef/8661_10_8/report/index.html">8661_10_8</a></th>
+                            <td><a href="Clustering Coef/adj/8661_10_8/report/index.html">Clustering Coef/adj/8661_10_8</a></td>
+                            <td><a href="Clustering Coef/csr/8661_10_8/report/index.html">Clustering Coef/csr/8661_10_8</a></td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+            <li><a href="MinCut/report/index.html">MinCut</a></li>
+
+            <ul>
+                <li>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th><a href="MinCut/fast_karger_stein PathCompression/report/index.html">fast_karger_stein PathCompression</a></th>
+                            <th><a href="MinCut/fast_karger_stein PathHalving/report/index.html">fast_karger_stein PathHalving</a></th>
+                            <th><a href="MinCut/fast_karger_stein PathSplitting/report/index.html">fast_karger_stein PathSplitting</a></th>
+                            <th><a href="MinCut/karger_stein PathCompression/report/index.html">karger_stein PathCompression</a></th>
+                            <th><a href="MinCut/karger_stein PathHalving/report/index.html">karger_stein PathHalving</a></th>
+                            <th><a href="MinCut/karger_stein PathSplitting/report/index.html">karger_stein PathSplitting</a></th>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/20_0.6_132/report/index.html">20_0.6_132</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/20_0.6_132/report/index.html">MinCut/fast_karger_stein PathCompression/20_0.6_132</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/20_0.6_132/report/index.html">MinCut/fast_karger_stein PathHalving/20_0.6_132</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/20_0.6_132/report/index.html">MinCut/fast_karger_stein PathSplitting/20_0.6_132</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/20_0.6_132/report/index.html">MinCut/karger_stein PathCompression/20_0.6_132</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/20_0.6_132/report/index.html">MinCut/karger_stein PathHalving/20_0.6_132</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/20_0.6_132/report/index.html">MinCut/karger_stein PathSplitting/20_0.6_132</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/30_0.4_215/report/index.html">30_0.4_215</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/30_0.4_215/report/index.html">MinCut/fast_karger_stein PathCompression/30_0.4_215</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/30_0.4_215/report/index.html">MinCut/fast_karger_stein PathHalving/30_0.4_215</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/30_0.4_215/report/index.html">MinCut/fast_karger_stein PathSplitting/30_0.4_215</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/30_0.4_215/report/index.html">MinCut/karger_stein PathCompression/30_0.4_215</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/30_0.4_215/report/index.html">MinCut/karger_stein PathHalving/30_0.4_215</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/30_0.4_215/report/index.html">MinCut/karger_stein PathSplitting/30_0.4_215</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/30_0.8_386/report/index.html">30_0.8_386</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/30_0.8_386/report/index.html">MinCut/fast_karger_stein PathCompression/30_0.8_386</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/30_0.8_386/report/index.html">MinCut/fast_karger_stein PathHalving/30_0.8_386</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/30_0.8_386/report/index.html">MinCut/fast_karger_stein PathSplitting/30_0.8_386</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/30_0.8_386/report/index.html">MinCut/karger_stein PathCompression/30_0.8_386</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/30_0.8_386/report/index.html">MinCut/karger_stein PathHalving/30_0.8_386</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/30_0.8_386/report/index.html">MinCut/karger_stein PathSplitting/30_0.8_386</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/40_0.6_494/report/index.html">40_0.6_494</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/40_0.6_494/report/index.html">MinCut/fast_karger_stein PathCompression/40_0.6_494</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/40_0.6_494/report/index.html">MinCut/fast_karger_stein PathHalving/40_0.6_494</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/40_0.6_494/report/index.html">MinCut/fast_karger_stein PathSplitting/40_0.6_494</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/40_0.6_494/report/index.html">MinCut/karger_stein PathCompression/40_0.6_494</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/40_0.6_494/report/index.html">MinCut/karger_stein PathHalving/40_0.6_494</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/40_0.6_494/report/index.html">MinCut/karger_stein PathSplitting/40_0.6_494</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/40_0.8_684/report/index.html">40_0.8_684</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/40_0.8_684/report/index.html">MinCut/fast_karger_stein PathCompression/40_0.8_684</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/40_0.8_684/report/index.html">MinCut/fast_karger_stein PathHalving/40_0.8_684</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/40_0.8_684/report/index.html">MinCut/fast_karger_stein PathSplitting/40_0.8_684</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/40_0.8_684/report/index.html">MinCut/karger_stein PathCompression/40_0.8_684</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/40_0.8_684/report/index.html">MinCut/karger_stein PathHalving/40_0.8_684</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/40_0.8_684/report/index.html">MinCut/karger_stein PathSplitting/40_0.8_684</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/50_0.6_769/report/index.html">50_0.6_769</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/50_0.6_769/report/index.html">MinCut/fast_karger_stein PathCompression/50_0.6_769</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/50_0.6_769/report/index.html">MinCut/fast_karger_stein PathHalving/50_0.6_769</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/50_0.6_769/report/index.html">MinCut/fast_karger_stein PathSplitting/50_0.6_769</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/50_0.6_769/report/index.html">MinCut/karger_stein PathCompression/50_0.6_769</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/50_0.6_769/report/index.html">MinCut/karger_stein PathHalving/50_0.6_769</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/50_0.6_769/report/index.html">MinCut/karger_stein PathSplitting/50_0.6_769</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/50_0.8_1015/report/index.html">50_0.8_1015</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/50_0.8_1015/report/index.html">MinCut/fast_karger_stein PathCompression/50_0.8_1015</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/50_0.8_1015/report/index.html">MinCut/fast_karger_stein PathHalving/50_0.8_1015</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/50_0.8_1015/report/index.html">MinCut/fast_karger_stein PathSplitting/50_0.8_1015</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/50_0.8_1015/report/index.html">MinCut/karger_stein PathCompression/50_0.8_1015</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/50_0.8_1015/report/index.html">MinCut/karger_stein PathHalving/50_0.8_1015</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/50_0.8_1015/report/index.html">MinCut/karger_stein PathSplitting/50_0.8_1015</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/60_0.6_1103/report/index.html">60_0.6_1103</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/60_0.6_1103/report/index.html">MinCut/fast_karger_stein PathCompression/60_0.6_1103</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/60_0.6_1103/report/index.html">MinCut/fast_karger_stein PathHalving/60_0.6_1103</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/60_0.6_1103/report/index.html">MinCut/fast_karger_stein PathSplitting/60_0.6_1103</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/60_0.6_1103/report/index.html">MinCut/karger_stein PathCompression/60_0.6_1103</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/60_0.6_1103/report/index.html">MinCut/karger_stein PathHalving/60_0.6_1103</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/60_0.6_1103/report/index.html">MinCut/karger_stein PathSplitting/60_0.6_1103</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/60_0.8_1460/report/index.html">60_0.8_1460</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/60_0.8_1460/report/index.html">MinCut/fast_karger_stein PathCompression/60_0.8_1460</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/60_0.8_1460/report/index.html">MinCut/fast_karger_stein PathHalving/60_0.8_1460</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/60_0.8_1460/report/index.html">MinCut/fast_karger_stein PathSplitting/60_0.8_1460</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/60_0.8_1460/report/index.html">MinCut/karger_stein PathCompression/60_0.8_1460</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/60_0.8_1460/report/index.html">MinCut/karger_stein PathHalving/60_0.8_1460</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/60_0.8_1460/report/index.html">MinCut/karger_stein PathSplitting/60_0.8_1460</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/70_0.2_572/report/index.html">70_0.2_572</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/70_0.2_572/report/index.html">MinCut/fast_karger_stein PathCompression/70_0.2_572</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/70_0.2_572/report/index.html">MinCut/fast_karger_stein PathHalving/70_0.2_572</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/70_0.2_572/report/index.html">MinCut/fast_karger_stein PathSplitting/70_0.2_572</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/70_0.2_572/report/index.html">MinCut/karger_stein PathCompression/70_0.2_572</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/70_0.2_572/report/index.html">MinCut/karger_stein PathHalving/70_0.2_572</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/70_0.2_572/report/index.html">MinCut/karger_stein PathSplitting/70_0.2_572</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/70_0.6_1497/report/index.html">70_0.6_1497</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/70_0.6_1497/report/index.html">MinCut/fast_karger_stein PathCompression/70_0.6_1497</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/70_0.6_1497/report/index.html">MinCut/fast_karger_stein PathHalving/70_0.6_1497</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/70_0.6_1497/report/index.html">MinCut/fast_karger_stein PathSplitting/70_0.6_1497</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/70_0.6_1497/report/index.html">MinCut/karger_stein PathCompression/70_0.6_1497</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/70_0.6_1497/report/index.html">MinCut/karger_stein PathHalving/70_0.6_1497</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/70_0.6_1497/report/index.html">MinCut/karger_stein PathSplitting/70_0.6_1497</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/70_0.8_1983/report/index.html">70_0.8_1983</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/70_0.8_1983/report/index.html">MinCut/fast_karger_stein PathCompression/70_0.8_1983</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/70_0.8_1983/report/index.html">MinCut/fast_karger_stein PathHalving/70_0.8_1983</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/70_0.8_1983/report/index.html">MinCut/fast_karger_stein PathSplitting/70_0.8_1983</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/70_0.8_1983/report/index.html">MinCut/karger_stein PathCompression/70_0.8_1983</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/70_0.8_1983/report/index.html">MinCut/karger_stein PathHalving/70_0.8_1983</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/70_0.8_1983/report/index.html">MinCut/karger_stein PathSplitting/70_0.8_1983</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCut/80_0.8_2587/report/index.html">80_0.8_2587</a></th>
+                            <td><a href="MinCut/fast_karger_stein PathCompression/80_0.8_2587/report/index.html">MinCut/fast_karger_stein PathCompression/80_0.8_2587</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathHalving/80_0.8_2587/report/index.html">MinCut/fast_karger_stein PathHalving/80_0.8_2587</a></td>
+                            <td><a href="MinCut/fast_karger_stein PathSplitting/80_0.8_2587/report/index.html">MinCut/fast_karger_stein PathSplitting/80_0.8_2587</a></td>
+                            <td><a href="MinCut/karger_stein PathCompression/80_0.8_2587/report/index.html">MinCut/karger_stein PathCompression/80_0.8_2587</a></td>
+                            <td><a href="MinCut/karger_stein PathHalving/80_0.8_2587/report/index.html">MinCut/karger_stein PathHalving/80_0.8_2587</a></td>
+                            <td><a href="MinCut/karger_stein PathSplitting/80_0.8_2587/report/index.html">MinCut/karger_stein PathSplitting/80_0.8_2587</a></td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+            <li><a href="MinCutCount/report/index.html">MinCutCount</a></li>
+
+            <ul>
+                <li>
+                    <table>
+                        <tr>
+                            <th></th>
+                            <th><a href="MinCutCount/fast_karger_stein_count_PathCompression/report/index.html">fast_karger_stein_count_PathCompression</a></th>
+                            <th><a href="MinCutCount/fast_karger_stein_count_PathHalving/report/index.html">fast_karger_stein_count_PathHalving</a></th>
+                            <th><a href="MinCutCount/fast_karger_stein_count_PathSplitting/report/index.html">fast_karger_stein_count_PathSplitting</a></th>
+                            <th><a href="MinCutCount/karger_stein_count_PathCompression/report/index.html">karger_stein_count_PathCompression</a></th>
+                            <th><a href="MinCutCount/karger_stein_count_PathHalving/report/index.html">karger_stein_count_PathHalving</a></th>
+                            <th><a href="MinCutCount/karger_stein_count_PathSplitting/report/index.html">karger_stein_count_PathSplitting</a></th>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/20_0.6_132/report/index.html">20_0.6_132</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/20_0.6_132/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/20_0.6_132</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/20_0.6_132/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/20_0.6_132</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/20_0.6_132/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/20_0.6_132</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/20_0.6_132/report/index.html">MinCutCount/karger_stein_count_PathCompression/20_0.6_132</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/20_0.6_132/report/index.html">MinCutCount/karger_stein_count_PathHalving/20_0.6_132</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/20_0.6_132/report/index.html">MinCutCount/karger_stein_count_PathSplitting/20_0.6_132</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/30_0.4_215/report/index.html">30_0.4_215</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/30_0.4_215/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/30_0.4_215</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/30_0.4_215/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/30_0.4_215</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/30_0.4_215/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/30_0.4_215</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/30_0.4_215/report/index.html">MinCutCount/karger_stein_count_PathCompression/30_0.4_215</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/30_0.4_215/report/index.html">MinCutCount/karger_stein_count_PathHalving/30_0.4_215</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/30_0.4_215/report/index.html">MinCutCount/karger_stein_count_PathSplitting/30_0.4_215</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/30_0.8_386/report/index.html">30_0.8_386</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/30_0.8_386/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/30_0.8_386</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/30_0.8_386/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/30_0.8_386</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/30_0.8_386/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/30_0.8_386</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/30_0.8_386/report/index.html">MinCutCount/karger_stein_count_PathCompression/30_0.8_386</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/30_0.8_386/report/index.html">MinCutCount/karger_stein_count_PathHalving/30_0.8_386</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/30_0.8_386/report/index.html">MinCutCount/karger_stein_count_PathSplitting/30_0.8_386</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/40_0.6_494/report/index.html">40_0.6_494</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/40_0.6_494/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/40_0.6_494</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/40_0.6_494/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/40_0.6_494</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/40_0.6_494/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/40_0.6_494</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/40_0.6_494/report/index.html">MinCutCount/karger_stein_count_PathCompression/40_0.6_494</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/40_0.6_494/report/index.html">MinCutCount/karger_stein_count_PathHalving/40_0.6_494</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/40_0.6_494/report/index.html">MinCutCount/karger_stein_count_PathSplitting/40_0.6_494</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/40_0.8_684/report/index.html">40_0.8_684</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/40_0.8_684/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/40_0.8_684</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/40_0.8_684/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/40_0.8_684</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/40_0.8_684/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/40_0.8_684</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/40_0.8_684/report/index.html">MinCutCount/karger_stein_count_PathCompression/40_0.8_684</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/40_0.8_684/report/index.html">MinCutCount/karger_stein_count_PathHalving/40_0.8_684</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/40_0.8_684/report/index.html">MinCutCount/karger_stein_count_PathSplitting/40_0.8_684</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/50_0.6_769/report/index.html">50_0.6_769</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/50_0.6_769/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/50_0.6_769</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/50_0.6_769/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/50_0.6_769</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/50_0.6_769/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/50_0.6_769</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/50_0.6_769/report/index.html">MinCutCount/karger_stein_count_PathCompression/50_0.6_769</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/50_0.6_769/report/index.html">MinCutCount/karger_stein_count_PathHalving/50_0.6_769</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/50_0.6_769/report/index.html">MinCutCount/karger_stein_count_PathSplitting/50_0.6_769</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/50_0.8_1015/report/index.html">50_0.8_1015</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/50_0.8_1015/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/50_0.8_1015</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/50_0.8_1015/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/50_0.8_1015</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/50_0.8_1015/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/50_0.8_1015</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/50_0.8_1015/report/index.html">MinCutCount/karger_stein_count_PathCompression/50_0.8_1015</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/50_0.8_1015/report/index.html">MinCutCount/karger_stein_count_PathHalving/50_0.8_1015</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/50_0.8_1015/report/index.html">MinCutCount/karger_stein_count_PathSplitting/50_0.8_1015</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/60_0.6_1103/report/index.html">60_0.6_1103</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/60_0.6_1103/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/60_0.6_1103</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/60_0.6_1103/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/60_0.6_1103</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/60_0.6_1103/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/60_0.6_1103</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/60_0.6_1103/report/index.html">MinCutCount/karger_stein_count_PathCompression/60_0.6_1103</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/60_0.6_1103/report/index.html">MinCutCount/karger_stein_count_PathHalving/60_0.6_1103</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/60_0.6_1103/report/index.html">MinCutCount/karger_stein_count_PathSplitting/60_0.6_1103</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/60_0.8_1460/report/index.html">60_0.8_1460</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/60_0.8_1460/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/60_0.8_1460</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/60_0.8_1460/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/60_0.8_1460</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/60_0.8_1460/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/60_0.8_1460</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/60_0.8_1460/report/index.html">MinCutCount/karger_stein_count_PathCompression/60_0.8_1460</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/60_0.8_1460/report/index.html">MinCutCount/karger_stein_count_PathHalving/60_0.8_1460</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/60_0.8_1460/report/index.html">MinCutCount/karger_stein_count_PathSplitting/60_0.8_1460</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/70_0.2_572/report/index.html">70_0.2_572</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/70_0.2_572/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/70_0.2_572</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/70_0.2_572/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/70_0.2_572</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/70_0.2_572/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/70_0.2_572</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/70_0.2_572/report/index.html">MinCutCount/karger_stein_count_PathCompression/70_0.2_572</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/70_0.2_572/report/index.html">MinCutCount/karger_stein_count_PathHalving/70_0.2_572</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/70_0.2_572/report/index.html">MinCutCount/karger_stein_count_PathSplitting/70_0.2_572</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/70_0.6_1497/report/index.html">70_0.6_1497</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/70_0.6_1497/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/70_0.6_1497</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/70_0.6_1497/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/70_0.6_1497</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/70_0.6_1497/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/70_0.6_1497</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/70_0.6_1497/report/index.html">MinCutCount/karger_stein_count_PathCompression/70_0.6_1497</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/70_0.6_1497/report/index.html">MinCutCount/karger_stein_count_PathHalving/70_0.6_1497</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/70_0.6_1497/report/index.html">MinCutCount/karger_stein_count_PathSplitting/70_0.6_1497</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/70_0.8_1983/report/index.html">70_0.8_1983</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/70_0.8_1983/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/70_0.8_1983</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/70_0.8_1983/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/70_0.8_1983</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/70_0.8_1983/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/70_0.8_1983</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/70_0.8_1983/report/index.html">MinCutCount/karger_stein_count_PathCompression/70_0.8_1983</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/70_0.8_1983/report/index.html">MinCutCount/karger_stein_count_PathHalving/70_0.8_1983</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/70_0.8_1983/report/index.html">MinCutCount/karger_stein_count_PathSplitting/70_0.8_1983</a></td>
+                        </tr>
+                        <tr>
+                            <th><a href="MinCutCount/80_0.8_2587/report/index.html">80_0.8_2587</a></th>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathCompression/80_0.8_2587/report/index.html">MinCutCount/fast_karger_stein_count_PathCompression/80_0.8_2587</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathHalving/80_0.8_2587/report/index.html">MinCutCount/fast_karger_stein_count_PathHalving/80_0.8_2587</a></td>
+                            <td><a href="MinCutCount/fast_karger_stein_count_PathSplitting/80_0.8_2587/report/index.html">MinCutCount/fast_karger_stein_count_PathSplitting/80_0.8_2587</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathCompression/80_0.8_2587/report/index.html">MinCutCount/karger_stein_count_PathCompression/80_0.8_2587</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathHalving/80_0.8_2587/report/index.html">MinCutCount/karger_stein_count_PathHalving/80_0.8_2587</a></td>
+                            <td><a href="MinCutCount/karger_stein_count_PathSplitting/80_0.8_2587/report/index.html">MinCutCount/karger_stein_count_PathSplitting/80_0.8_2587</a></td>
+                        </tr>
+                    </table>
+                </li>
+            </ul>
+        </ul>
+    </div>
+    <div id="footer">
+        <p>This report was generated by
+            <a href="https://github.com/bheisler/criterion.rs">Criterion.rs</a>, a statistics-driven benchmarking
+            library in Rust.</p>
+    </div>
+</body>
+</html>
