@@ -89,7 +89,7 @@ impl BitArray {
         }
     }
 
-    pub fn iter(&self) -> Iter<'_> {
+    pub fn iter3(&self) -> Iter<'_> {
         Iter {
             slice: &*self.elems,
             register_size: self.register_size,
@@ -106,7 +106,7 @@ impl BitArray {
         }
     }
 
-    pub fn iter3(&self) -> impl Iterator<Item = u8> + '_ {
+    pub fn iter(&self) -> impl Iterator<Item = u8> + '_ {
         (0..self.capacity).map(move |i| self.get(i))
     }
 
@@ -123,12 +123,12 @@ impl BitArray {
     }
 }
 
-// #[inline] TODO: uncomment
+#[inline]
 const fn init_left_mask(r_size: usize) -> u8 {
     ((init_right_mask(r_size) as u16) << (WORD_SIZE - r_size)) as u8
 }
 
-// #[inline] TODO: uncomment
+#[inline]
 const fn init_right_mask(r_size: usize) -> u8 {
     ((1u16 << r_size) - 1) as u8
 }

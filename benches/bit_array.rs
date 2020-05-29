@@ -20,7 +20,7 @@ pub fn iteration(c: &mut Criterion) {
             &v,
             |b, v| {
                 b.iter(|| {
-                    v.iter().for_each(|i| {
+                    v.iter3().for_each(|i| {
                         black_box(i);
                     })
                 })
@@ -42,7 +42,7 @@ pub fn iteration(c: &mut Criterion) {
             &v,
             |b, v| {
                 b.iter(|| {
-                    v.iter3().for_each(|i| {
+                    v.iter().for_each(|i| {
                         black_box(i);
                     })
                 })
