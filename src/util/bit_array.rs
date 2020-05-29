@@ -11,7 +11,6 @@ use std::{
 ///
 /// If `register_size` is 5 then each number takes 5 bits of storage.
 ///
-#[derive(Clone)]
 pub struct BitArray {
     register_size: u8,
     elems: Box<[u8]>,
@@ -200,6 +199,22 @@ impl Iterator for Iter2<'_> {
 impl Debug for BitArray {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         format_slice(&*self.elems, self.register_size as usize, self.capacity, f)
+    }
+}
+
+impl Clone for BitArray {
+    fn clone(&self) -> Self {
+        Self {
+            register_size: self.register_size,
+            elems: self.elems.clone(),
+            capacity: self.capacity
+        }
+    }
+
+    fn clone_from(&mut self, other: &Self) {
+        self.register_size = self.register_size;
+        self.elems.clone_from(&other.elems);
+        self.capacity = other.capacity;
     }
 }
 

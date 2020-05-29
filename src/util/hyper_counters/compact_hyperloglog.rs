@@ -11,7 +11,6 @@ use std::{
 
 const TWO_POW_32: f64 = (1u64 << 32) as f64;
 
-#[derive(Clone)]
 pub struct CompactHyperLogLog<T, H = BuildHasherDefault<FxHasher>> {
     registers: BitArray,
     build_hasher: H,
@@ -130,6 +129,33 @@ where
     #[inline]
     fn union_onto(&self, other: &mut Self) -> bool {
         self.registers.max(&mut other.registers)
+    }
+}
+
+impl<T, H> Clone for CompactHyperLogLog<T, H>
+where
+    H: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            registers: self.registers.clone(),
+            build_hasher: self.build_hasher.clone(),
+            b: self.b,
+            m_minus_1: self.m_minus_1,
+            alpha_mm: self.alpha_mm,
+            seed: self.seed,
+            _marker: self._marker,
+        }
+    }
+
+    fn clone_from(&mut self, other: &Self) {
+        self.registers.clone_from(&other.registers.clone());
+        self.build_hasher.clone_from(&other.build_hasher.clone());
+        self.b = other.b;
+        self.m_minus_1 = other.m_minus_1;
+        self.alpha_mm = other.alpha_mm;
+        self.seed = other.seed;
+        self._marker = other._marker;
     }
 }
 

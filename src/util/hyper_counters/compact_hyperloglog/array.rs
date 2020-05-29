@@ -1,10 +1,12 @@
-use super::{super::{B, HyperLogLogCounter, CounterArray}, CompactHyperLogLog};
+use super::{
+    super::{CounterArray, HyperLogLogCounter, B},
+    CompactHyperLogLog,
+};
 use std::{
     hash::Hash,
     ops::{Deref, DerefMut},
 };
 
-#[derive(Clone)]
 pub struct CompactHyperLogLogArray<T> {
     counters: Box<[CompactHyperLogLog<T>]>,
     //max_aux_bufs: MaxAuxBuffers,
@@ -67,3 +69,14 @@ where
     }
 }
 
+impl<T> Clone for CompactHyperLogLogArray<T> {
+    fn clone(&self) -> Self {
+        Self {
+            counters: self.counters.clone(),
+        }
+    }
+
+    fn clone_from(&mut self, other: &Self) {
+        self.counters.clone_from(&other.counters);
+    }
+}
