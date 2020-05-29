@@ -24,7 +24,7 @@ pub fn bench(c: &mut Criterion) {
                 b.iter_batched(
                     || gen_graph::<CSR>(n, p),
                     |graph| {
-                        hyper_ball(&graph, || HyperLogLog::new(B::B4));
+                        hyper_ball(&graph, vec![HyperLogLog::new(B::B4); graph.vertices()].into_boxed_slice());
                     },
                     BatchSize::SmallInput,
                 )
@@ -36,7 +36,7 @@ pub fn bench(c: &mut Criterion) {
                 b.iter_batched(
                     || gen_graph::<CSR>(n, p),
                     |graph| {
-                        hyper_ball(&graph, || CompactHyperLogLog::new(B::B4, graph.vertices()));
+                        hyper_ball(&graph, CompactHyperLogLogArray::new(B::B4, graph.vertices()));
                     },
                     BatchSize::SmallInput,
                 )

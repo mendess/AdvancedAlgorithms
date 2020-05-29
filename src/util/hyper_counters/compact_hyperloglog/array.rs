@@ -2,24 +2,62 @@ use super::{
     super::{CounterArray, HyperLogLogCounter, B},
     CompactHyperLogLog,
 };
+use rustc_hash::FxHasher;
 use std::{
-    hash::Hash,
+    hash::{BuildHasher, BuildHasherDefault, Hash},
     ops::{Deref, DerefMut},
 };
 
-pub struct CompactHyperLogLogArray<T> {
-    counters: Box<[CompactHyperLogLog<T>]>,
+pub struct CompactHyperLogLogArray<T, H = BuildHasherDefault<FxHasher>> {
+    counters: Box<[CompactHyperLogLog<T, H>]>,
     //max_aux_bufs: MaxAuxBuffers,
 }
 
-impl<T> CompactHyperLogLogArray<T>
-where
-    T: Hash + Clone,
-{
-    pub fn new(b: B, vertices: usize, seed: u64) -> Self {
+impl<T> CompactHyperLogLogArray<T> {
+    pub fn new(b: B, vertices: usize) -> Self {
+        Self {
+            counters: vec![CompactHyperLogLog::new(b, vertices); vertices].into_boxed_slice(),
+            // max_aux_bufs: MaxAuxBuffers::new(vertices),
+        }
+    }
+
+    pub fn new_with_seed(b: B, vertices: usize, seed: u64) -> Self {
         Self {
             counters: vec![CompactHyperLogLog::new_with_seed(b, vertices, seed); vertices]
                 .into_boxed_slice(),
+            // max_aux_bufs: MaxAuxBuffers::new(vertices),
+        }
+    }
+}
+
+impl<T, H> CompactHyperLogLogArray<T, H>
+where
+    T: Hash + Clone,
+    H: BuildHasher + Clone,
+{
+    pub fn new_with_hasher(b: B, build_hasher: H, vertices: usize) -> Self {
+        Self {
+            counters: vec![
+                CompactHyperLogLog::new_with_hasher(b, build_hasher, vertices);
+                vertices
+            ]
+            .into_boxed_slice(),
+            // max_aux_bufs: MaxAuxBuffers::new(vertices),
+        }
+    }
+
+    pub fn new_with_hasher_and_seed(b: B, build_hasher: H, vertices: usize, seed: u64) -> Self {
+        Self {
+            counters: vec![
+                CompactHyperLogLog::new_with_hasher_and_seed(
+                    b,
+                    build_hasher,
+                    vertices,
+                    seed
+                );
+                vertices
+            ]
+            .into_boxed_slice(),
             // max_aux_bufs: MaxAuxBuffers::new(vertices),
         }
     }

@@ -38,7 +38,10 @@ impl<T> CompactHyperLogLog<T, BuildHasherDefault<FxHasher>> {
     }
 }
 
-impl<T, H> CompactHyperLogLog<T, H> {
+impl<T, H> CompactHyperLogLog<T, H>
+where
+    H: BuildHasher,
+{
     pub fn new_with_hasher_and_seed(
         b: B,
         build_hasher: H,

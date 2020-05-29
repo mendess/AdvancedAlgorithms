@@ -71,7 +71,10 @@ mod tests {
     #[test]
     fn run_compact() {
         let g = graph_one::<CSR<()>>();
-        let apl = hyper_ball(&g, CompactHyperLogLogArray::new(B::B4, g.vertices(), SEED));
+        let apl = hyper_ball(
+            &g,
+            CompactHyperLogLogArray::new_with_seed(B::B4, g.vertices(), SEED),
+        );
         eprintln!("APL: {}", apl);
         approx::assert_relative_eq!(apl, GRAPH_ONE_APL, max_relative = 1.0);
     }
@@ -84,7 +87,10 @@ mod tests {
                 &g,
                 vec![HyperLogLog::new_with_seed(B::B4, SEED); g.vertices()].into_boxed_slice(),
             ),
-            hyper_ball(&g, CompactHyperLogLogArray::new(B::B4, g.vertices(), SEED))
+            hyper_ball(
+                &g,
+                CompactHyperLogLogArray::new_with_seed(B::B4, g.vertices(), SEED)
+            )
         )
     }
 }
