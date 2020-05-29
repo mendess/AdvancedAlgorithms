@@ -18,7 +18,7 @@ pub fn gen_edge_list(n: usize, p: f64) -> EdgeList {
     gen_graph::<EdgeList>(n, p)
 }
 
-pub fn make_params() -> Vec<(usize, f64, usize)> {
+pub fn make_params() -> impl Iterator<Item=(usize, f64, usize)> {
     [1_usize, 5, 9]
         .iter()
         .map(|i| i * 10)
@@ -29,5 +29,4 @@ pub fn make_params() -> Vec<(usize, f64, usize)> {
             let g = gen_edge_list(n, p);
             (n, p, g.vertices() + g.edges())
         })
-        .collect::<Vec<_>>()
 }

@@ -72,7 +72,7 @@ macro_rules! bench_karger_stein_count {
 
 pub fn bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("MinCut");
-    for (n, p, e) in make_params() {
+    for (n, p, e) in make_params().filter(|p| p.0 != 100 && p.0 != 500) {
         group.throughput(Throughput::Elements(e as u64));
         bench_karger_stein!(group, PathCompression, n, p, e);
         bench_karger_stein!(group, PathSplitting, n, p, e);
@@ -83,7 +83,7 @@ pub fn bench(c: &mut Criterion) {
 
 pub fn bench_count(c: &mut Criterion) {
     let mut group = c.benchmark_group("MinCutCount");
-    for (n, p, e) in make_params() {
+    for (n, p, e) in make_params().filter(|p| p.0 != 100 && p.0 != 500) {
         group.throughput(Throughput::Elements(e as u64));
         bench_karger_stein_count!(group, PathCompression, n, p, e);
         bench_karger_stein_count!(group, PathSplitting, n, p, e);
