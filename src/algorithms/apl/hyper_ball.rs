@@ -1,37 +1,31 @@
 use crate::{
     graphs::{csr::CSR, *},
-    util::hyper_counters::HyperLogLogCounter,
+    util::hyper_counters::{CounterArray, HyperLogLogCounter},
 };
 
 #[derive(Clone)]
-struct HyperBall<H: HyperLogLogCounter<usize>> {
-    counters: Box<[H]>,
+struct HyperBall<H: CounterArray<usize>> {
+    counters: H,
 }
 
-impl<H: HyperLogLogCounter<usize> + Clone> HyperBall<H> {
-    fn new<F>(n: usize, f: F) -> Self
-    where
-        F: Fn() -> H,
-    {
-        Self {
-            counters: vec![f(); n].into(),
-        }
+impl<H: CounterArray<usize> + Clone> HyperBall<H> {
+    fn new(counters: H) -> Self {
+        Self { counters }
     }
 }
 
-pub fn hyper_ball<F, H, E>(g: &CSR<E>, f: F) -> f64
+pub fn hyper_ball<H, E>(g: &CSR<E>, counters: H) -> f64
 where
-    H: HyperLogLogCounter<usize> + Clone,
-    F: Fn() -> H,
+    H: CounterArray<usize> + Clone,
 {
-    let mut ball = HyperBall::new(g.vertices(), f);
+    let mut ball = HyperBall::new(counters);
     for v in g.nodes() {
         ball.counters[v].register(v);
     }
     let mut apls = vec![0.0; g.vertices()].into_boxed_slice();
     let mut modified = true;
     let mut t = 0;
-    let mut new_counters: Box<[H]> = ball.counters.clone();
+    let mut new_counters = ball.counters.clone();
     while modified {
         modified = false;
         for (v, successors) in g.neighbourhoods().enumerate() {
@@ -66,7 +60,10 @@ mod tests {
     #[test]
     fn run_normal() {
         let g = graph_one::<CSR<()>>();
-        let apl = hyper_ball(&g, || HyperLogLog::new_with_seed(B::B4, SEED));
+        let apl = hyper_ball(
+            &g,
+            vec![HyperLogLog::new_with_seed(B::B4, SEED); g.vertices()].into_boxed_slice(),
+        );
         eprintln!("APL: {}", apl);
         approx::assert_relative_eq!(apl, GRAPH_ONE_APL, max_relative = 1.0);
     }
@@ -74,9 +71,7 @@ mod tests {
     #[test]
     fn run_compact() {
         let g = graph_one::<CSR<()>>();
-        let apl = hyper_ball(&g, || {
-            CompactHyperLogLog::new_with_seed(B::B4, g.vertices(), SEED)
-        });
+        let apl = hyper_ball(&g, CompactHyperLogLogArray::new(B::B4, g.vertices(), SEED));
         eprintln!("APL: {}", apl);
         approx::assert_relative_eq!(apl, GRAPH_ONE_APL, max_relative = 1.0);
     }
@@ -85,12 +80,11 @@ mod tests {
     fn equivalence() {
         let g = graph_one::<CSR<()>>();
         assert_eq!(
-            hyper_ball(&g, || HyperLogLog::new_with_seed(B::B4, SEED)),
-            hyper_ball(&g, || CompactHyperLogLog::new_with_seed(
-                B::B4,
-                g.vertices(),
-                SEED
-            ))
+            hyper_ball(
+                &g,
+                vec![HyperLogLog::new_with_seed(B::B4, SEED); g.vertices()].into_boxed_slice(),
+            ),
+            hyper_ball(&g, CompactHyperLogLogArray::new(B::B4, g.vertices(), SEED))
         )
     }
 }

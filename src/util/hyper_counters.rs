@@ -1,8 +1,10 @@
 pub mod compact_hyperloglog;
 pub mod hyperloglog;
 
-pub use compact_hyperloglog::CompactHyperLogLog;
+pub use compact_hyperloglog::{array::CompactHyperLogLogArray, CompactHyperLogLog};
 pub use hyperloglog::HyperLogLog;
+
+use std::ops::DerefMut;
 
 pub trait HyperLogLogCounter<T> {
     fn register(&mut self, t: T);
@@ -62,6 +64,16 @@ macro_rules! sh_b {
     };
 }
 sh_b!(u8, u16, u32, u64, usize);
+
+pub trait CounterArray<T>
+where
+    Self: Clone,
+    Self: DerefMut<Target = [<Self as CounterArray<T>>::Counter]>,
+{
+    type Counter: HyperLogLogCounter<T> + Clone;
+
+    fn union_onto(&mut self, from: usize, other: &mut Self::Counter) -> bool;
+}
 
 #[cfg(test)]
 mod tests {

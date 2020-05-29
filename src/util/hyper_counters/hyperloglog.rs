@@ -1,4 +1,4 @@
-use super::{HyperLogLogCounter, B};
+use super::{CounterArray, HyperLogLogCounter, B};
 use crate::util::{jenkins, random_numbs};
 use rustc_hash::FxHasher;
 use std::{
@@ -43,7 +43,7 @@ impl<T, H: Clone> Clone for HyperLogLog<T, H> {
         self.m_minus_1 = other.m_minus_1;
         self.b = other.b;
         self.hasher.clone_from(&other.hasher);
-        self.alpha_mm.clone_from(&other.alpha_mm);
+        self.alpha_mm = other.alpha_mm;
         self.seed = other.seed;
         self._marker = other._marker;
     }
@@ -153,6 +153,17 @@ impl<T: Hash, H: BuildHasher> HyperLogLogCounter<T> for HyperLogLog<T, H> {
                 *o = u8::max(*s, *o);
                 old_o != *o
             })
+    }
+}
+
+impl<T> CounterArray<T> for Box<[HyperLogLog<T>]>
+where
+    T: Hash,
+{
+    type Counter = HyperLogLog<T>;
+
+    fn union_onto(&mut self, from: usize, other: &mut Self::Counter) -> bool {
+        self[from].union_onto(other)
     }
 }
 

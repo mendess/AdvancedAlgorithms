@@ -1,3 +1,4 @@
+pub mod array;
 use super::{HyperLogLogCounter, B};
 use crate::util::{bit_array::BitArray, jenkins, random_numbs};
 use rustc_hash::FxHasher;
