@@ -24,7 +24,7 @@ pub fn make_params() -> impl Iterator<Item=(usize, f64, usize)> {
         .map(|i| i * 10)
         .flat_map(|n| [0.4, 0.5, 0.7].iter().map(move |&p| (n, p)))
         .chain(std::iter::once((100, 0.5)))
-        .chain(std::iter::once((200, 0.5)))
+        .chain(std::iter::once((100, 0.7)))
         .map(|(n, p)| {
             let g = gen_edge_list(n, p);
             (n, p, g.vertices() + g.edges())
