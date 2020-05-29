@@ -32,7 +32,7 @@ pub fn make_params() -> impl Iterator<Item = ((Adjacency, CSR, Vec<usize>), usiz
 pub fn bench(c: &mut Criterion) {
     let mut group = c.benchmark_group("Clustering Coef");
     for ((adj, csr, node_indexes), d, o) in make_params() {
-        let n = adj.vertices() + adj.edges();
+        let n = adj.vertices().pow(2) + adj.edges();
         group.throughput(Throughput::Elements(n as u64));
         group.bench_function(BenchmarkId::new("adj", format!("{}_{}_{}", n, d, o)), |b| {
             b.iter(|| c_coef(20, black_box(&node_indexes), black_box(&adj), make_rng()))
