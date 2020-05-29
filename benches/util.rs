@@ -38,6 +38,6 @@ pub fn make_params() -> impl Iterator<Item = (usize, f64, usize)> {
     .copied()
     .map(|(n, p)| {
         let g = gen_edge_list(n, p);
-        (n, p, g.vertices() + g.edges())
+        (n, p, g.vertices().pow(2) + g.edges())
     })
 }
